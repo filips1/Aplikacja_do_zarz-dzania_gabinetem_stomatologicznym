@@ -1,0 +1,47 @@
+    <h5 class="my-0 mr-md-auto font-weight-normal">
+
+        {% if request.user.is_authenticated %}
+            {{request.user.username}}  
+        {% else %}
+          Witaj
+        {% endif %}
+    </h5>
+    
+
+        {% if request.user.is_authenticated %}
+            <a class = "p-2 text-dark" href = "{% url 'app' %}">Strona domowa</a> 
+            <a class = "p-2 text-dark" href = "{% url 'account' %}">Edytuj Dane Konta</a> 
+            <a class = "p-2 text-dark" href = "{% url 'locations' %}">Mapa dentystów</a> 
+            {% if has_account %}
+            <a class = "p-2 text-dark" href = "{% url 'calendar' %}">Wizyty </a>
+
+                        <a class = "p-2 text-dark" href = "{% url 'info' %}">Powiadomienia <span class="badge badge-pill badge-primary">{{messages}}</span></a>
+            {% endif %}
+            {% if request.user.is_dentist %}
+
+            {% if has_account %}
+                <a class = "p-2 text-dark" href = "{% url 'dentist_profile' dentist.id  %}">Mój Profil </a>
+               <a class = "p-2 text-dark" href = "{% url 'registermore' %}">dodaj Pacjenta</a>
+              <a class = "p-2 text-dark" href = "{% url 'patients' %}">moi pacjenci</a>
+              {% else %}
+              <a class = "p-2 text-dark" href = "{% url 'registermore' %}">Dokończ rejestracje</a>
+              {% endif %}
+              {% else %}
+              {% if has_account == False %}
+               <a class = "p-2 text-dark" href = "{% url 'registermore' %}">Dokończ rejestracje</a>
+              {% endif %}
+              <a class = "p-2 text-dark" href = "{% url 'choose_dentist' %}">wybierz dentystę</a>
+
+            {% endif %}
+            <img src="/media/{{request.user.profile_pic}}" class="rounded-circle z-depth-0"
+            alt="avatar image" width=50 height=50>
+             <a class="btn btn-outline-danger" href="{% url 'logout' %}">Wyloguj</a>
+
+
+
+        {% else %}
+            <a class = "p-2 text-dark" href = "{% url 'app' %}">Strona domowa</a>           
+            <a class = "p-2 text-dark" href = "{% url 'register' %}">Zarejestruj się</a> 
+        <a class="btn btn-outline-success" href="{% url 'login' %}">Zaloguj się</a>
+
+            {% endif %}

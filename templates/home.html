@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% load static %}
+<style>    .center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+
+}
+
+    .special_container:after,.special_container:before{content:"";display:table;clear:both}
+
+
+.fa-calendar,.fa-smile-o {font-size:200px}
+.margines{margin:16px!important}
+.margines-top{margin-top:16px!important}
+.margines-right{margin-right:16px!important}
+.centrowanie{text-align:center!important}
+.card_color{color:#fff!important;background-color:#a6c!important}
+.big_font{font-size:24px!important}\
+.padding_grid{padding:0 8px}
+.padding_big{padding-top:64px!important;padding-bottom:64px!important}
+.content_margin{margin-left:auto;margin-right:auto;max-width:980px}
+
+.small_padding{padding-top:32px!important;padding-bottom:32px!important}
+.small_pole{float:left;width:66.66666%;padding:0 8px}
+.very_small_pole{float:left;width:33.33333%;padding:0 8px}
+</style>
+
+<div class="special_container card_color centrowanie" style="padding:128px 16px">
+  <img src="{% static "logo.png" %}"
+     class="center animated lightSpeedIn delay-1s" alt=" Logo" 
+     id="animated-img1">
+  <h1 class="margines"style="font-size:64px">Witaj</h1>
+
+  <p class="big_font">na stronie do zarządzania gabinetem stomatologicznym</p>
+  {% if request.user.is_authenticated %}
+  {% if fully_reg %}
+
+
+
+
+  {% if request.user.is_dentist %}
+  <a class="btn btn-black  big_font guziki margines-top" id = "dentist_profile" href="{% url 'dentist_profile' %}">Mój profil</a>
+  <a class="btn btn-black  big_font guziki margines-top" id = "calendar" href="{% url 'calendar' %}">Kalendarz Wizyt</a>
+  {% else %}
+    <a class="btn btn-black  big_font guziki margines-top" id = "locations" href="{% url 'locations' %}">Mapa Dentystów</a>
+    <a class="btn btn-black  big_font guziki margines-top" id = "dentist_list" href="{% url 'choose_dentist'%}">Lista Dentystów</a>
+  {% endif %}
+
+
+  {% else %}
+  <a class="btn btn-black  big_font guziki margines-top" id="registermore"href="{% url 'registermore' %}">Dokończ Rejestracje</a>
+  {% endif %}
+  <a class="btn btn-black  big_font guziki margines-top" id = "account" href="{% url 'account' %}">Ustawienia konta</a>
+  {% else %}
+  <a class="btn btn-black  big_font guziki margines-top" id = "register" href="{% url 'register' %}">Zarejestruj się</a>
+  <a class="btn btn-black  big_font guziki margines-top" id = "login" href="{% url 'login' %}">Zaloguj się</a>
+  {% endif %}
+</div>
+
+<!-- First Grid -->
+<div class="padding_grid padding_big special_container">
+  <div class="content_margin">
+    <div class="small_pole">
+      <h1>Dla Dentysty</h1>
+      <h5 class="small_padding">Dentysta dzięki naszemu programowi ma możliwość łatwego zarządzania swoim gabinetem. Może operować zapisywaniem wizyt samemu, może też korzystać z pomocy Recepcjonisty.</h5>
+
+      <p style="color:grey">Dentysta posiada także możliwość przeglądu danych swoich pacjentów czy też możliwość prowadzenia konwersacji przy pomocy czatu z innymi użytkownikami korzystającymi z programu. Może też oznaczyć na mapie położenie swojego gabinetu a także opisać wszyskie swoje umiejętności, osiągnięcia oraz zdjęcia na swoim profilu. Przy tworzeniu nowej wizyty automatycznie zostanie wprowadzona najbliższa możliwa data a po zatwierdzeniu, cena za wizyte zostanie wpisana bazując na cenniku</p>
+    </div>
+
+    <div class="very_small_pole centrowanie">
+      <i class="fa fa-calendar padding_big"></i>
+    </div>
+  </div>
+</div>
+
+<!-- Second Grid -->
+<div class="padding_grid   special_container" style="background-color:light-grey">
+  <div class="content_margin">
+    <div class="very_small_pole centrowanie">
+<i class="fa fa-smile-o"></i>
+      <i class="fa fa-teeth padding_big margines-right"></i>
+    </div>
+
+    <div class="small_pole">
+      <h1>Dla pacjenta</h1>
+      <h5 class="small_padding">Pacjent ma możliwość dopisania się do listy pacjentów danego dentysty , a także tworzenia nowych wizyt które jednak muszą być zatwierdzone przez dentystę.</h5>
+
+      <p style="color:grey">Pacjent może też przeglądać mapę gabinetów dentystycznych. Po wybraniu odpowiedniego adresu może też przejść do szczegółów w których może znaleźć informację na tematy takie jak godziny otwarcia czy też adresy kontaktowe. Może on też przeglądać profile dentystów na których może pisać swoje komentarze. Przy rejestracji pacjent może wybrać czy jego konto ma być widoczne w wyszukiwarce pacjentów u dentystów u których nie jest zapisany.</p>
+    </div>
+  </div>
+</div>
+
+<div class=" padding_big centrowanie" style="background-color:grey; color:white">  
+    <h1 class="margines big_font">Praca wykonana przez Filip Szpunar</h1>
+</div>
+
+
+
+
+
+{% endblock content %}

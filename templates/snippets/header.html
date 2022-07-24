@@ -1,0 +1,253 @@
+{% load static %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <!-- Bootstrap -->
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Material Design for Bootstrap -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.5.16/css/mdb.min.css" rel="stylesheet">
+<script src='https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js'></script>
+<link href='https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css' rel='stylesheet' />
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+
+
+<!--Navbar -->
+<nav class="mb-1 navbar navbar-expand-lg navbar-dark secondary-color lighten-1">
+  {% if request.user.is_authenticated %}
+
+
+  <a class="navbar-brand" href="{% url 'app' %}">{{user.username}}</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent-555"
+    aria-controls="navbarSupportedContent-555" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent-555">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="{% url 'app' %}">Strona Domowa
+          <span class="sr-only">(current)</span>
+        </a>
+      </li>
+        {% if has_account %}
+  {% if request.user.is_receptionist %}
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-555" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">Profile Dentystów
+        </a>
+
+        <div class="dropdown-menu dropdown-secondary" aria-labelledby="navbarDropdownMenuLink-555">
+          {% for dentist in receptionist_main.dentist.all %}
+          <a class="dropdown-item" href="{% url 'dentist_profile' dentist.id %}">{{dentist}}</a>
+          {% endfor %}
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-555" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">Pacjenci dentysty
+        </a>
+
+        <div class="dropdown-menu dropdown-secondary" aria-labelledby="navbarDropdownMenuLink-555">
+          {% for dentist in receptionist_main.dentist.all %}
+          <a class="dropdown-item" href="{% url 'patients_only_receptionist_dentist' dentist.id %}">{{dentist}}</a>
+          {% endfor %}       
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-555" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">Moja lokalizacja
+        </a>
+
+        <div class="dropdown-menu dropdown-secondary" aria-labelledby="navbarDropdownMenuLink-555">
+          <a class="dropdown-item" href="{% url 'location_add'  %}">Dodaj Nową</a>
+          {% for l in my_locations %}
+          <a class="dropdown-item" href="{% url 'clinic_location_info' l.id %}">{{l.name}}</a>
+          {% endfor %}       
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-555" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">Dentyści
+        </a>
+
+        <div class="dropdown-menu dropdown-secondary" aria-labelledby="navbarDropdownMenuLink-555">
+          <a class="dropdown-item" href="{% url 'choose_dentist'%}">Lista Dentystów</a>
+          <a class="dropdown-item" href="{% url 'locations' %}">Mapa Dentystów</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-555" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">Czat
+        </a>
+
+        <div class="dropdown-menu dropdown-secondary" aria-labelledby="navbarDropdownMenuLink-555">
+          <a class="dropdown-item" href="{% url 'chat_info' %}">Otwarte Czaty</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-555" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">Kalendarz wizyt
+        </a>
+
+        <div class="dropdown-menu dropdown-secondary" aria-labelledby="navbarDropdownMenuLink-555">
+          {% for dentist in receptionist_main.dentist.all %}
+          <a class="dropdown-item" href="{% url 'calendar' dentist.id %}">{{dentist}}</a>
+          {% endfor %}
+        </div>
+      </li>
+      </ul>
+    {% elif request.user.is_dentist %}
+      <li class="nav-item dropdown" id="dropdown_patient">
+        <a class="nav-link" id="patient_list_header" href="{% url 'patients' %}">Lista Pacjentów 
+        </a>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-555" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">Moja lokalizacja
+        </a>
+
+        <div class="dropdown-menu dropdown-secondary" aria-labelledby="navbarDropdownMenuLink-555">
+          <a class="dropdown-item" href="{% url 'location_add'  %}">Dodaj Nową</a>
+          {% for l in my_locations %}
+          <a class="dropdown-item" href="{% url 'clinic_location_info' l.id %}">{{l.name}}</a>
+          {% endfor %}       
+        </div>
+      </li>
+
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">Dentyści
+        </a>
+
+        <div class="dropdown-menu dropdown-secondary" aria-labelledby="navbarDropdownMenuLink-555">
+          <a class="dropdown-item" href="{% url 'choose_dentist'%}">Lista Dentystów</a>
+          <a class="dropdown-item" href="{% url 'locations' %}">Mapa Dentystów</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-555" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">Czat
+        </a>
+
+        <div class="dropdown-menu dropdown-secondary" aria-labelledby="navbarDropdownMenuLink-555">
+          <a class="dropdown-item" href="{% url 'chat_info' %}">Otwarte Czaty</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-555" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">Kalendarz wizyt
+        </a>
+
+        <div class="dropdown-menu dropdown-secondary" aria-labelledby="navbarDropdownMenuLink-555">
+          <a class="dropdown-item" href="{% url 'calendar' %}">Kalendarz</a>
+          <a class="dropdown-item" href="{% url 'unaproved' %}">Wizyty do zatwierdzenia</a>
+        </div>
+      </li>
+      </ul>
+    {% else %}
+
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" id="dentist_dropdown" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">Dentyści
+        </a>
+
+        <div class="dropdown-menu dropdown-secondary" aria-labelledby="navbarDropdownMenuLink-555">
+          <a class="dropdown-item" id="dentist_list_header" href="{% url 'choose_dentist'%}">Lista Dentystów</a>
+          <a class="dropdown-item" href="{% url 'locations' %}">Mapa Dentystów</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-555" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">Czat
+        </a>
+
+        <div class="dropdown-menu dropdown-secondary" aria-labelledby="navbarDropdownMenuLink-555">
+          <a class="dropdown-item" href="{% url 'chat_info' %}">Otwarte Czaty</a>
+          <a class="dropdown-item" href="#">Wyszukiwarka użytkowników</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-555" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">Kalendarz wizyt
+        </a>
+
+        <div class="dropdown-menu dropdown-secondary" aria-labelledby="navbarDropdownMenuLink-555">
+          <a class="dropdown-item" href="{% url 'calendar' %}">Kalendarz</a>
+          <a class="dropdown-item" href="{% url 'calendar' %}">Wizyty do zatwierdzenia</a>
+        </div>
+      </li>
+      </ul>
+    {% endif %}
+    {% else %}
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'registermore' %}">Dokończ rejestracje</a>
+      </li>
+          <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-555" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">Dentyści
+        </a>
+
+        <div class="dropdown-menu dropdown-secondary" aria-labelledby="navbarDropdownMenuLink-555">
+          <a class="dropdown-item" href="{% url 'choose_dentist'%}">Lista Dentystów</a>
+          <a class="dropdown-item" href="{% url 'locations' %}">Mapa Dentystów</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-555" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">Czat
+        </a>
+
+        <div class="dropdown-menu dropdown-secondary" aria-labelledby="navbarDropdownMenuLink-555">
+          <a class="dropdown-item" href="{% url 'chat_info' %}">Otwarte Czaty</a>
+        </div>
+      </li>
+    </ul>
+    {% endif %}
+    <ul class="navbar-nav ml-auto nav-flex-icons">
+      <li class="nav-item">
+        <a class="nav-link waves-effect waves-light" href="{% url 'info' %}"><span class="badge badge-pill badge-primary">{{infos}}</span>
+          <i class="fa fa-envelope"></i>
+        </a>
+      </li>
+      <li class="nav-item avatar dropdown">
+        <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-55" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">
+          <img src="/media/{{request.user.profile_pic}}" class="rounded-circle z-depth-0"
+            alt="avatar image" width=40 height=40>
+        </a>
+        <div class="dropdown-menu dropdown-menu-lg-right dropdown-secondary"
+          aria-labelledby="navbarDropdownMenuLink-55">
+          <a class="dropdown-item" href="{% url 'account' %}">Edytuj konto</a>
+          <a class="dropdown-item" href="{% url 'registermore' %}">Dane Osobowe</a>
+          {% if has_account and request.user.is_dentist %}
+          <a class="dropdown-item" href="{% url 'dentist_profile' %}">Mój profil</a>
+          {% endif %}
+        </div>
+
+      </li>
+    </ul>
+
+
+                 <a class="btn btn-danger" href="{% url 'logout' %}">Wyloguj</a>
+    {% else %}
+      <div class="collapse navbar-collapse" id="navbarSupportedContent-555">
+    <ul class="navbar-nav mr-auto">
+          <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-555" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">Dentyści
+        </a>
+
+        <div class="dropdown-menu dropdown-secondary" aria-labelledby="navbarDropdownMenuLink-555">
+          <a class="dropdown-item" href="{% url 'choose_dentist'%}">Lista Dentystów</a>
+          <a class="dropdown-item" href="{% url 'locations' %}">Mapa Dentystów</a>
+        </div>
+      </li>
+      </ul>
+          <ul class="navbar-nav ml-auto nav-flex-icons">
+                 <a class="btn btn-danger" href="{% url 'register' %}">Zarejestruj się</a>
+                 <a class="btn btn-danger" href="{% url 'login' %}">Zaloguj się</a>
+               </ul>
+        {% endif %}
+  </div>
+</nav>
+<!--/.Navbar -->
