@@ -1,0 +1,324 @@
+
+<style type='text/css'>
+.form {
+  margin: auto;
+}
+
+.form input, .form select, .form textarea {
+  border-radius: 5px;
+  border: 1px solid #17a2b8;
+  outline: none;
+  background: none;
+  padding: 5px;
+  width: 100%;
+}
+
+
+.xdsoft_datetimepicker .xdsoft_calendar .testowycss {
+    background: blue;
+    background-color: lightgreen;
+    box-shadow: green 0 1px 4px 0 inset;
+    color: #000;
+}
+
+.xdsoft_datetimepicker .xdsoft_calendar .yellowcss {
+    background: blue;
+    background-color: yellow;
+    box-shadow: green 0 1px 4px 0 inset;
+    color: #000;
+}
+.xdsoft_datetimepicker .xdsoft_calendar .redcss {
+    background: blue;
+    background-color: #FA8072;
+    box-shadow: red 0 1px 4px 0 inset;
+    color: #000;
+}
+
+
+</style>
+    <div class="card">
+      <h3 class="card-header light-blue lighten-1 white-text text-uppercase font-weight-bold text-center py-5">Nowa Wizyta</h3>
+      <div class="card-body">
+{% if isd %}
+<form method="post" class="visit_new_create_form"action="{% url 'new_visit_heh' id %}">
+{% elif edit %}
+<form method="post" class="visit_new_create_form "action="{% url 'visit_edit_new' id %}">
+{% elif patient_create %}
+<form method="post" class="visit_new_create_form "action="{% url 'new_by_patient' %}">
+  {% elif date_change %}
+<form method="post" class="visit_new_create_form "action="{% url 'visit_date_change' id  %}">
+{% elif new_visit %}
+<form method="post" class="visit_new_create_form"action="{% url 'new_visit' %}">
+{% elif receptionist_new %}
+<form method="post" autocomplete="off" class="visit_new_create_form" action="{% url 'new_visit_receptionist' id %}">
+{% endif %}
+  {% csrf_token %}
+  {% if not edit %}
+  <div id = "lengthdiv">
+  <p style="font-size:14px">
+Długość wizyty: &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+
+<input type="radio" name="length" value="30">30 min
+<input type="radio" name="length" value="45">45 min
+<input type="radio" name="length" value="60" checked="checked">60 min
+<input type="radio" name="length" value="90">90 min</p>
+</div>
+{% endif %}
+<table class="form form-table">
+{% if date_change or edit %}
+{{form}}
+{% else %}
+
+
+<tbody><tr><th><label for="id_day_of_visit">Dzień zaplanowanej wizyty:</label></th><td><input name="day_of_visit" required="" id="id_day_of_visit"></td></tr>
+<tr><th><label for="id_time_of_the_visit">Godzina zaplanowanej wizyty:</label></th><td><input name="time_of_the_visit" required="" id="id_time_of_the_visit"></td></tr>
+<tr><th><label for="id_time_end_visit">Godzina końca wizyty:</label></th><td><input type="time" name="time_end_visit" required="" id="id_time_end_visit"></td></tr>
+  {% if new_visit or receptionist_new %}
+<tr><th><label for="id_status">Status:</label></th><td>{{form.status}}</td></tr>
+{% else %}
+{{form.status}}
+{% endif %}
+<tr><th><label for="id_Type_of">Rodzaj Wizyty:</label></th><td>{{form.Type_of}}<td></tr>
+  {% if new_visit or receptionist_new %}
+<tr><th><label for="id_Patient">Pacjent:</label></th><td>{{form.Patient}}</td></tr>
+{% else %}
+{{form.Patient}}
+{% endif %}
+{% if patient_create %}
+<tr><th><label for="id_Dentist">Dentysta:</label></th><td>{{form.Dentist}}</td></tr>
+{% else %}
+{{form.Dentist}}
+{% endif %}
+<tr><th><label for="id_desc">Opis przebiegu wizyty:</label></th><td><textarea name="desc" cols="40" rows="10" id="id_desc"></textarea></td></tr>
+{{form.cost}}<input type="hidden" name="Tooth_Repaired" id="id_Tooth_Repaired">
+
+      
+    
+ 
+  </tbody>
+{% endif %}
+</table>
+  <center>
+
+
+           <button type="submit" id="visit_form_submit" class="btn btn-info create_new_visit"> Zatwierdź </button></center>
+</form>
+      </div>
+
+    </div>
+
+<script>
+var x 
+var y
+var z
+var q
+var day_of_visit
+  $(function () {
+
+"{% if new_visit_auto %}"
+console.log("TESTOWE")
+document.getElementById("id_day_of_visit").value = "{{date}}"
+document.getElementById("id_time_of_the_visit").value = "{{time}}"
+document.getElementById("id_time_end_visit").value = "{{time_plus_hour}}"
+"{% endif %}"
+
+
+
+
+var ajax = function( currentDateTime ){
+      console.log(document.getElementById("id_day_of_visit").value)
+      var a = "/visit/possible_hours/"+document.getElementById("id_day_of_visit").value +"/"+ document.getElementById("id_Dentist").value + "/" + $('input[name=length]:checked', '.visit_new_create_form').val(); 
+      console.log(a)
+        $.ajax({
+      url: a,
+      type: 'get',
+      dataType: 'json',
+      beforeSend: function () {
+        console.log(document.getElementById("id_day_of_visit").value)
+        console.log("UDAŁO SIE")
+      },
+      success: function (data) {
+        x = data.times
+        y = data.worked
+        document.getElementById("id_time_of_the_visit").value = data.first
+        document.getElementById("id_time_end_visit").value = data.end_hour
+    }
+
+
+
+});
+
+}
+
+
+
+var visit_length_change = function( currentDateTime ){
+      var a = "/visit/visit_length_change_update/"+ document.getElementById("id_Dentist").value + "/" + $('input[name=length]:checked', '.visit_new_create_form').val(); 
+      console.log(a)
+        $.ajax({
+      url: a,
+      type: 'get',
+      dataType: 'json',
+      beforeSend: function () {
+        console.log(document.getElementById("id_day_of_visit").value)
+        console.log("UDAŁO SIE")
+      },
+      success: function (data) {
+
+        document.getElementById("id_day_of_visit").value = data.date
+        var a = "/visit/possible_hours/"+data.date +"/"+ document.getElementById("id_Dentist").value + "/" + $('input[name=length]:checked', '.visit_new_create_form').val(); 
+                $.ajax({
+      url: a,
+      type: 'get',
+      dataType: 'json',
+      beforeSend: function () {
+        console.log(document.getElementById("id_day_of_visit").value)
+        console.log("UDAŁO SIE")
+      },
+      success: function (data) {
+        x = data.times
+        y = data.worked
+        document.getElementById("id_time_of_the_visit").value = data.first
+        document.getElementById("id_time_end_visit").value = data.end_hour
+    }
+
+
+
+});
+
+    }
+
+
+
+});
+
+}
+$('#lengthdiv input').on('change', function() {
+  visit_length_change()
+});
+
+
+$('#id_day_of_visit').datetimepicker({
+minDate: '0',
+});
+
+
+$("#id_status").change(function(){
+  console.log($("#id_status").val())
+  if ($("#id_status").val() == "odbyła sie"){
+    console.log("HALO")
+    $('#id_day_of_visit').datetimepicker({
+
+maxDate: '0',
+
+ minDate: '1.12.2000',
+ formatDate: 'D.MM.YYYY',
+});
+  }
+  else{
+              console.log("NIEEEE")
+    $('#id_day_of_visit').datetimepicker({
+maxDate: '22.12.2045',
+ formatDate: 'D.MM.YYYY',
+ minDate: '0',
+
+});
+  }
+});
+
+$.datetimepicker.setLocale('pl');
+
+
+var logic = function( currentDateTime ){
+  this.setOptions({
+    allowTimes: x
+  })
+  console.log(x)
+  y = false
+}
+
+var ajax_oth = function( currentDateTime ){
+        $.ajax({
+      url: "{% url 'update_fin_hour' 12345 789  %}".replace(/12345/, document.getElementById("id_time_of_the_visit").value).replace(/789/,$('input[name=length]:checked', '.visit_new_create_form').val()),
+      type: 'get',
+      dataType: 'json',
+      beforeSend: function () {
+        console.log("UDAŁO SIE")
+      },
+      success: function (data) {
+        document.getElementById("id_time_end_visit").value = data.end_time
+
+    }
+
+
+
+});
+}
+
+ var Test =  function(currentDateTime){ 
+      year = currentDateTime.getYear()
+      month = currentDateTime.getMonth()
+      dentist = document.getElementById("id_Dentist").value
+      length = $('input[name=length]:checked', '.visit_new_create_form').val()
+      if ($("#id_status").val() == "odbyła sie"){
+        type = "past"
+      }
+      else{
+        type = "now"
+      }
+
+      urlname = '/visit/safe_days/' + year + '/' + month + '/'+ dentist +'/'+ length + '/' + type
+               $.ajax({ 
+      url: urlname,
+      type: 'get',
+      dataType: 'json',
+      beforeSend: function () {
+        console.log(document.getElementById("id_day_of_visit").value)
+        console.log("UDAŁO SIE")
+      },
+      success: function (data) {
+        z = data.green 
+        q = data.yellow
+        $('#id_day_of_visit').datetimepicker({
+                    highlightedDates: data.green, formatDate:'d.m.Y', 
+                    disabledDates: data.red, formatDate:'d.m.Y', 
+                    usedDates: data.yellow, formatDate: 'd.m.Y'
+                });
+
+    }
+
+
+
+});
+  console.log(z)
+
+ };
+
+
+
+jQuery('#id_time_of_the_visit').datetimepicker({
+  datepicker:false,
+  format:'H:i',
+  onShow:logic,
+  onChangeDateTime:ajax_oth,
+
+
+})
+jQuery('#id_day_of_visit').datetimepicker({
+    timepicker:false,
+    format:'Y-m-d',
+    onShow:Test,
+    onChangeMonth:Test,
+    onChangeYear:Test,
+    onChangeDateTime:ajax,
+    dayOfWeekStart: 1,
+    disabledWeekDays: "{{weekends}}"
+
+
+  })
+
+
+
+
+});
+</script>

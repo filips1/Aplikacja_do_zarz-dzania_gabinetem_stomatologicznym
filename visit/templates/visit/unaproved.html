@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+<style type="text/css">
+
+.center {
+  background-color: white;
+  width: 300px;
+  height: 300px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+}
+h1{
+  text-align: center
+}
+b{
+  text-align: left;
+}
+</style>
+{% if request.user.is_authenticated %}
+<table class="table">
+  <thead class="thead-dark">
+    <tr>
+      {% if request.user.is_dentist %}
+        <th scope="col">Pacjent</th>
+      {% else %}
+        <th scope="col">Dentysta</th>
+      {% endif %}
+      <th scope="col">Status wizyty</th>
+      <th scope="col">Planowany dzień wizyty</th>
+      <th scope="col">Planowany czas wizyty</th>
+      <th scope="col">Planowany czas końca wizyty</th>
+      <th scope="col">Zatwierdź lub odrzuć wizytę</th>
+    </tr>
+  </thead>
+  {% for visit in visits %}
+  <tr>
+    {% if request.user.is_dentist %}
+      <td>{{visit.Patient}}</td>
+    {% else %}
+      <td>{{visit.Dentist}}</td>
+    {% endif %}
+
+    <td>{{visit.status}}</td>
+    <td>{{visit.day_of_visit}}</td>
+    <td>{{visit.time_of_the_visit}}</td>
+    <td>{{visit.time_end_visit}}</td>
+    <td> 
+      {% if request.user.is_receptionist %}
+        <a class="btn btn-info" href = "{% url 'visit_approve' visit.id dentist_id %}">Zatwierdź Wizytę</a>&nbsp&nbsp&nbsp
+        <a class="btn btn-info" href = "{% url 'visit_reject' visit.id dentist_id %}">Odrzuć Wizytę</a></td>
+
+      {% else %}
+      {% if request.user.is_dentist and visit.status == 'nie potwierdzona' %}
+
+        <a class="btn btn-info" href = "{% url 'visit_approve' visit.id %}">Zatwierdź Wizytę</a>&nbsp&nbsp&nbsp
+      
+      {% elif  visit.status == 'do zatwierdzenia przez pacjenta' %}
+        <a class="btn btn-info" href = "{% url 'visit_approve' visit.id %}">Zatwierdź wizytę</a>&nbsp&nbsp&nbsp
+      {% endif %}
+      <a class="btn btn-info" href = "{% url 'visit_reject' visit.id %}">Odrzuć Wizytę</a></td>
+      {% endif %}
+  </tr>
+
+
+  {% endfor %}
+  </table>
+{% endif %}
+
+
+
+
+
+
+
+{% endblock content %}

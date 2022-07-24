@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+<style type="text/css">
+
+.center {
+  background-color: white;
+  width: 300px;
+  height: 300px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+}
+h1{
+  text-align: center
+}
+b{
+  text-align: left;
+}
+</style>
+
+
+
+<div class="modal-dialog">
+  <div class="modal-content">
+    <div class="modal-body">
+
+      <center>
+         <p><b>Pacjent: </b>{{visit.Patient}}</p>
+  <p><b>Dentysta: </b>{{visit.Dentist}}</p>
+  <p><b>Status Wizyty: </b>{{visit.status}}</p>
+  <p><b>Dzień wizyty:</b>{{visit.day_of_visit}}</p>
+  <p><b>Czas wizyty:</b>{{visit.time_of_the_visit}}</p>
+  <p><b>Czas zakończenia wizyty: </b>{{visit.time_end_visit}}</p>
+  <p><b>Leczone zęby: </b>{%for t in toot%}{{t}}{% endfor %}</p>
+  <p><b>Szczegóły: </b>{{vis_det.desc}}</p>
+  <p><b>Zarobek: </b>{{vis_det.cost}}</p>
+  <hr>
+  {% if user.is_dentist %}
+    <a class="btn btn-info" href = "{% url 'visit_edit' visit.id %}">Edytuj Wizytę</a>
+
+    <a class="btn btn-info" href = "{% url 'visit_edit_details' visit.id %}">Edytuj Szczegóły</a>
+  {% endif %}
+        </center>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+{% endblock content %}

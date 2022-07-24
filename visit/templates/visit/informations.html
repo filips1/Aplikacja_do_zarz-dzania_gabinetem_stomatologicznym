@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+<style type="text/css">
+
+.center {
+  text-align: center;
+
+
+}
+h1{
+  text-align: center
+}
+b{
+  text-align: left;
+}
+.pogrubienie{
+font-weight: 700 
+}
+</style>
+{% if info%}
+<table class="table">
+  <thead class="thead-dark">
+    <tr>
+        <th scope="col">Data zmiany</th>
+      <th scope="col">Rodzaj zmiany</th>
+      <th scope="col">Opis</th>
+      <th scope="col">Status</th>
+      <th scope="col">Zaznacz jako obejrzane</th>
+      <th scope="col">Usuń</th>
+      <th scope="col">Opcje</th>
+    </tr>
+  </thead>
+  {% for infos in info %}
+  <tr>
+    {% if infos.czytano == False %}
+    <td style="font-weight: bold">{{infos.date_of_change}}</td>
+    <td style="font-weight: bold">{{infos.type_of}}</td>
+    <td style="font-weight: bold">{{infos.desc}}</td>
+    <td style="font-weight: bold">Nieobejrzane</td>
+    <td><a class="btn btn-info" href = "{% url 'info_seen' infos.id %}">Zaznacz</a></td>
+    {% else %}
+    <td>{{infos.date_of_change}}</td>
+    <td>{{infos.changed}}</td>
+    <td>{{infos.type_of}}</td>
+    <td>{{infos.desc}}</td>
+    <td>Obejrzane</td>
+      {% endif %}
+    
+
+    <td><a class="btn btn-info" href = "{% url 'info_delete' infos.id %}">Usuń</a></td>
+        {% if infos.type_of == "czat" %}
+    <td><a class="btn btn-info" href = "{% url 'chat' infos.special_data %}">Przejdź na czat</a></td>
+    {% endif %}
+   
+
+  {% endfor %}
+</table>
+{% else %}
+<div class="center">
+Brak nowych powiadomień
+</div>
+{% endif %}
+
+
+
+
+
+
+
+{% endblock content %}

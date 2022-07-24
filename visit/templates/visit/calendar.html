@@ -1,0 +1,427 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% load static %}
+<div class="clearfix">
+    {% if receptionist %}
+    <a class="btn btn-info left" href="{% url 'calendar' dentist_id %}?{{ prev_month }}"> Poprzedni miesiąc</a>
+        <a class="btn btn-info left" href="{% url 'calendar' dentist_id %}">Obecny miesiąc </a>
+    {% else %}
+    <a class="btn btn-info left" href="{% url 'calendar' %}?{{ prev_month }}"> Poprzedni miesiąc</a>
+        <a class="btn btn-info left" href="{% url 'calendar' %}">Obecny miesiąc </a>
+    {% endif %}
+
+    {% if request.user.is_dentist %}
+    <button class="btn btn-info left" data-url="{% url 'new_visit' %}" data-toggle="modal" id="visit_new" >Nowa Wizyta</button>
+    {% elif request.user.is_receptionist %}
+    <button class="btn btn-info left" data-url="{% url 'new_visit_receptionist' dentist_id %}" data-toggle="modal" id="visit_new" >Nowa Wizyta</button>    
+    {% else %}
+
+    <button class="btn btn-info left" data-url="{% url 'new_by_patient' %}" data-toggle="modal" id="visit_patient_new" >Nowa Wizyta</button>
+    {% endif %}
+    {% if receptionist %}
+    <a class="btn btn-info right" href="{% url 'calendar' dentist_id %}?{{ next_month }}"> Następny miesiąc </a>
+    <a class="btn btn-info right" href="{% url 'unaproved' dentist_id %}">Wizyty do zatwierdzenia</a>
+    {% else %}
+    <a class="btn btn-info right" href="{% url 'calendar' %}?{{ next_month }}"> Następny miesiąc </a>
+        <a class="btn btn-info right" href="{% url 'unaproved' %}">Wizyty do zatwierdzenia</a>
+    {% endif %}
+
+        <a class="btn btn-info right" href="{% url 'info' %}">Powiadomienia</a>
+
+</div>
+
+  <div class="modal fade" id="visit_modal_new">
+    <div class="modal-dialog" style="position: relative">
+      <div class="modal-content">
+      </div>
+    </div>
+  </div>
+
+    <div class="modal fade " id="visit_td_edit_modal" style=" 
+   z-index: 3000; ">
+    <div class="modal-dialog" style=" 
+   z-index: 3000; ">
+      <div class="modal-content"  style=" 
+   z-index: 3000; ">
+      </div>
+    </div>
+  </div>
+
+    <div class="modal fade " id="visit_all_td_modal" style=" 
+   z-index: 3000; ">
+    <div class="modal-dialog modal-lg" style=" 
+   z-index: 3000; ">
+      <div class="modal-content"  style=" 
+   z-index: 3000; ">
+      </div>
+    </div>
+  </div>
+
+
+    <div class="modal fade " id="visit_add_tooth_to_visit_modal" style=" 
+   z-index: 3000; ">
+    <div class="modal-dialog modal-lg" style=" 
+   z-index: 3000; ">
+      <div class="modal-content"  style=" 
+   z-index: 3000; ">
+      </div>
+    </div>
+  </div>
+
+
+
+  <div class="modal fade " id="visit_tooth_modal">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable" style="overflow-y: initial; width:1250px;">
+      <div class="modal-content" style="max-height: 80vh;
+    overflow-y: auto">
+      </div>
+    </div>
+  </div>
+
+<style type="text/css">
+.calendar {
+  width: 98%;
+  margin: auto;
+  font-size: 13px;
+}
+
+.calendar tr, .calendar td {
+  border: 1px solid black;
+
+}
+
+@media (min-width: 768px) {
+  .modal-xl {
+    width: 90%;
+   max-width:1200px;
+  }
+}
+
+.calendar th {
+  padding: 10px;
+  text-align: center;
+  font-size: 18px;
+
+}
+
+.calendar td {
+  width: 200px;
+  height: 150px;
+  padding: 10px 0px 0px 5px;
+
+}
+
+
+.month {
+  font-size: 25px;
+
+}
+
+.date {
+  font-size: 16px;
+  margin-left: 0px;
+}
+
+.past {
+  background-color: #fff2e6
+}
+
+.future {
+  background-color: #e6ffe6
+}
+
+.now {
+  background-color: #ffffcc
+}
+
+ul {
+  height: 100%;
+  padding: 0px 5px 0px 0px;
+}
+
+
+a {
+  color: #17a2b8;
+}
+.left {
+  float: left;
+}
+
+.right {
+  float: right;
+}
+.center{
+float: left;
+}
+.centra {
+  background-color: white;
+  width: 300px;
+  height: 300px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+.btn {
+  outline: none;
+  color: black;
+  background-color: transparent;
+  box-shadow: 0 0 0 0;
+}
+
+.clearfix {
+  margin: 15px;
+}
+.center {
+  background-color: white;
+  width: 300px;
+  height: 300px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+}
+.visit_modal_new{
+  margin: 100px;
+}
+
+h1{
+  text-align: center
+}
+b{
+  text-align: left;
+}
+.modal-title{
+  position: absolute;
+  left: 35%;
+}
+.modal-footer{
+  margin: 0 auto;
+}
+@keyframes blinker {
+    from {opacity: 1.0;}
+    to {opacity: 0.0;}
+  }
+  
+.blink {
+    text-decoration: blink;
+    animation-name: blinker;
+    animation-duration: 0.6s;
+    animation-iteration-count:infinite;
+    animation-timing-function:ease-in-out;
+    animation-direction: alternate;
+  }
+
+  .calendar .event {
+  clear: both;
+  display: block;
+  font-size: 13px;
+  border-radius: 4px;
+  padding: 5px;
+  margin-top: 10px;
+  margin-bottom: 5px;
+  line-height: 14px;
+  background: #e4f2f2;
+  border: 1px solid #b5dbdc;
+  color: #009aaf;
+  text-decoration: none;
+}
+
+.calendar .event-desc {
+  color: #666;
+  margin: 3px 0 7px 0;
+  text-decoration: none;  
+}
+
+</style> 
+<div id="calendar_spec">
+{{calendar}}
+</div>
+
+<script>
+
+$(function () {
+
+
+const calendar =  $("#calendar_spec body");
+$('#visit_modal').draggable(); 
+
+
+  var loadForm = function () {
+
+    var btn = $(this);
+    $.ajax({
+      url: btn.attr("data-url"),
+      type: 'get',
+      dataType: 'json',
+      success: function (data) {
+        $('.modal').modal('hide');
+        $("#visit_modal_new").modal("show");
+        $('#visit_modal_new').draggable(); 
+        $("#visit_modal_new .modal-content").html(data.html_form);
+      }
+    });
+  };
+
+
+
+
+var SpecialEdit = function () {
+          var btn = $(this);
+    $.ajax({
+      url: "{% url 'check_tooth_status' 12345  %}".replace(/12345/, btn.attr('id').toString()),
+      type: 'get',
+      dataType: 'json',
+      beforeSend: function () {
+        $('.modal').modal('hide');
+        $("#visit_tooth_modal").modal("show");
+
+      },
+      success: function (data) {
+        $("#visit_tooth_modal .modal-content").html(data.html_form);
+      }
+  });
+};
+
+
+
+
+
+
+  var saveForm = function () {
+    var form = $(this);
+    $.ajax({
+      url: form.attr("action"),
+      data: form.serialize(),
+      type: form.attr("method"),
+      dataType: 'json',
+      success: function (data) {
+        if (data.form_is_fine) {
+          alert("Wykonano");  
+          $("#visit_modal_new").modal("hide")
+            if (data.refresh){
+              location.reload()
+            }
+            $(data.modal+" .modal-content").html(data.html_form);
+            $(data.modal).modal("show");
+        }
+      else {
+          $("#visit_modal_new .modal-content").html(data.html_form);
+        }
+      }
+    });
+    return false;
+  };
+
+
+  var secsaveForm = function () {
+    var form = $(this);
+    $.ajax({
+
+      url: form[0][3].formAction,
+      data: form.serialize(),
+      type: form.attr("method"),
+      dataType: 'json',
+      success: function (data) {
+        if (data.form_is_fine) {
+
+
+          alert("Wykonano");  // <-- This is just a placeholder for now for testing
+          const tooth_table =  $("#td_"+data.tooth+" tbody")
+
+                      tooth_table.fadeTo('slow', 0).promise().then(() => {
+                // replace the HTML contents
+                tooth_table.html(data['html_form'])
+                // fade-too the div with new contents
+                tooth_table.fadeTo('slow', 1)
+      });
+        
+                    }
+                    else{
+                      alert("Błędne dane");
+        }
+
+
+
+
+
+      }
+    });
+    return false;
+  };
+
+  var thsaveForm = function () {
+    var form = $(this);
+    $.ajax({
+
+      url: form.attr("action"),
+      data: form.serialize(),
+      type: form.attr("method"),
+      dataType: 'json',
+      success: function (data) {
+        if (data.form_is_fine) {
+
+             $('.modal-backdrop').css('z-index', '1040')
+            $("#visit_td_edit_modal").modal("hide");
+          $("#visit_tooth_modal").modal("show");        
+
+          alert("Wykonano");  // <-- This is just a placeholder for now for testing
+          const tooth_table =  $("#td_"+data.tooth+" tbody")
+
+                      tooth_table.fadeTo('slow', 0).promise().then(() => {
+                // replace the HTML contents
+                tooth_table.html(data['html_form'])
+                // fade-too the div with new contents
+                tooth_table.fadeTo('slow', 1)
+
+      });
+
+               $("#img_"+data.tooth).fadeTo('slow', 0).promise().then(() => {
+                // replace the HTML contents
+                $("#img_"+data.tooth).attr('src',"/static/"+data.toothimg);
+                // fade-too the div with new contents
+                $("#img_"+data.tooth).fadeTo('slow', 1)
+
+      });
+
+                    }
+
+
+
+
+
+      }
+    });
+    return false;
+  };
+
+  $(".advanced_visit_edit").click(SpecialEdit)
+  $(".specjalne").click(loadForm);
+  $("#visit_patient_new").click(loadForm);
+  $("#visit_new").click(loadForm);
+  $(".delete_visit").click(loadForm);
+  $(".change_date").click(loadForm);
+  $(".cancel").click(loadForm);
+  $(".revive").click(loadForm);
+
+  $("#visit_modal_new").on("submit", ".visit_delete_form", saveForm); 
+  $("#visit_modal_new").on("submit", ".visit_new_create_form", saveForm); 
+  $("#visit_tooth_modal").on("submit", ".visit_new_create_form", secsaveForm); 
+
+  $("#visit_tooth_modal").on("submit", ".visit_tooth_form", secsaveForm); 
+  $("#visit_td_edit_modal").on("submit", ".visit_edit_td_form", thsaveForm); 
+
+
+
+
+});
+
+
+
+
+</script>
+{% endblock %}
+
+

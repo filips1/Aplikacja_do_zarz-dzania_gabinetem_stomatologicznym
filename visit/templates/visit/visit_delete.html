@@ -1,0 +1,30 @@
+{% if cancel %}
+<form method="post" action="{% url 'visit_cancel' visit.id %}" class="visit_delete_form">
+{% elif revive or accept %}
+<form method="post" action="{% url 'visit_revive' visit.id %}" class="visit_delete_form">
+{% else %}
+<form method="post" action="{% url 'visit_delete' visit.id %}" class="visit_delete_form">
+{% endif %}
+  {% csrf_token %}
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <h4 class="modal-title">Na pewno</h4>
+  </div>
+  <div class="modal-body">
+    {% if cancel %}
+     <p class="lead">Czy na pewno chcesz odwołać  wizytę? <strong>{{ visit }}</strong>?</p>
+     {% elif revive %}
+          <p class="lead">Czy na pewno chcesz przywrócić odwołaną wizytę? <strong>{{ visit }}</strong>?</p>
+      {% elif accept %}
+          <p class="lead">Czy na pewno chcesz zaakceptować  wizytę po zmianie daty? <strong>{{ visit }}</strong>?</p>    
+    {% else %}
+    <p class="lead">Czy na pewno chcesz usunąć  wizytę? <strong>{{ visit }}</strong>?</p>
+    {% endif %}
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+    <button type="submit" class="btn btn-danger">Usuń</button>
+  </div>
+</form>
