@@ -1,4 +1,4 @@
-# Aplikacja_do_zarządzania_gabinetem_stomatologicznym
+# Aplikacja do zarządzania gabinetem stomatologicznym
 
 Celem aplikacji było zaprojektowanie oraz implementacja aplikacji internetowej służącej do zarządzania gabinetem stomatologicznym. 
 
