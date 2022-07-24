@@ -1,0 +1,238 @@
+{% load static %}
+    <div class="card">
+      <h3 class="card-header light-blue lighten-1 white-text text-uppercase font-weight-bold text-center py-5 ">Szczegóły leczenia</h3>
+      <div class="card-body">
+                    {% if no_tooth %}
+<center><h4>NIE MA ŻADNEGO ZĘBA W TEJ WIZYCIE</h4></center>
+ <center>
+                            <button type="button" id="tooth_add_btn"
+            class="btn btn-red add_tooth_to_visit_btn"
+            data-url="{% url 'add_tooth_to_visit' visit_id %}">Dodaj ząb</button><br/>
+{% else %}
+        <center>
+                            <button type="button" id="tooth_add_btn"
+            class="btn btn-red add_tooth_to_visit_btn"
+            data-url="{% url 'add_tooth_to_visit' visit_id %}">Dodaj ząb</button><br/>
+
+
+                <button type="button"
+            class="btn btn-sm btn-info add_all_visit_tooth_all_td_to_visit"
+            data-url="{% url 'add_all_visit_tooth_all_td_to_visit' visit_id %}">Dodaj wszystkie uszkodzenia do wizyty</button>
+                        <button type="button"
+            class="btn btn-sm btn-info add_all_visit_tooth_all_nh_td_to_visit"
+            data-url="{% url 'add_all_visit_tooth_all_nh_td_to_visit' visit_id %}">Dodaj wszystkie nieleczone uszkodzenia </button>
+                        <button type="button"
+            class="btn btn-sm btn-info add_all_visit_tooth_all_nh_np_td_to_visit"
+            data-url="{% url 'add_all_visit_tooth_all_nh_np_td_to_visit' visit_id %}">Dodaj wszystkie uszkodzenia nieleczone lub bez zaplanowanego leczenia </button></center>
+
+
+{% for a,toot in lista %}
+<center>
+
+<img class="ha" id = "img_{{a.id}}" src="{% static toot %}"  alt="logo" width="70" height="100"> 
+<center>
+  Pozycja zęba: <b>{{a.number}} {{a.side}} {{a.level}}</b><br/>
+  Typ: <b>{{a.tooth_type}}</b><br/>
+  Status: <b>{{a.status}}</b>
+
+</center>
+
+
+<br/>
+            <button type="button"
+            class="btn btn-sm btn-info remove_tooth_from_visit"
+            data-url="{% url 'remove_tooth_from_visit' a.id visit_id %}">Usuń ząb</button><br/>
+            <button type="button"
+            class="btn btn-sm btn-info show_all_destructions"
+            data-url="{% url 'check_all_td' a.id visit_id %}">Wyświetl wszystkie uszkodzenia</button>
+            <button type="button"
+            class="btn btn-sm btn-info new_visit_td_form"
+            data-url="{% url 'new_visit_td' a.id visit_id %}">Dodaj nowe uszkodzenie</button>
+
+</center>
+
+<table class="table table-striped" id="td_{{a.id}}" class = "tooths">
+  <thead>
+    <tr>
+      <th scope="col">Wielkość uszkodzenia</th>
+      <th scope="col">Strona</th>
+      <th scope="col">Głębokość</th>
+      <th scope="col">Poziom</th>
+      <th scope="col">Wyleczone</th>
+
+      <th scope="col"><center>Sposób leczenia<center></th>
+    </tr>
+  </thead>
+  <tbody>
+        {% include 'tooth/snippets/check_visit_tooth_snippet.html' %}
+</tbody>
+</table>
+</form>
+
+{% endfor %}
+
+
+
+            <center><button type="button" id="zapisz_wizyte" class="btn btn-info save">Zapisz</button></center><br/>
+{% endif %}
+</div>
+</div>
+
+<style type="text/css">
+    
+    th {
+    text-align:center
+}
+</style>
+<script type="text/javascript">
+  $(document).off('hide.bs.modal')
+    $(function () {
+
+  var specialForm = function () {
+    var btn = $(this);
+    $.ajax({
+      url: btn.attr("data-url"),
+      type: 'get',
+      dataType: 'json',
+      beforeSend: function () {
+              $('.modal-backdrop').css('z-index', '2000')
+            $("#visit_td_edit_modal").modal("show");
+      },
+      success: function (data) {
+
+        $("#visit_td_edit_modal .modal-content").html(data.html_form);
+      }
+              
+    });
+  };
+
+
+  var specialAddingToothForm = function () {
+    var btn = $(this);
+    $.ajax({
+      url: btn.attr("data-url"),
+      type: 'get',
+      dataType: 'json',
+      beforeSend: function () {
+              $('.modal-backdrop').css('z-index', '2000')
+            $("#visit_add_tooth_to_visit_modal").modal("show");
+      },
+      success: function (data) {
+
+        $("#visit_add_tooth_to_visit_modal .modal-content").html(data.html_form);
+      }
+              
+    });
+  };
+
+
+
+
+    var specialallForm = function () {
+    var btn = $(this);
+    $.ajax({
+      url: btn.attr("data-url"),
+      type: 'get',
+      dataType: 'json',
+      beforeSend: function () {
+              $('.modal-backdrop').css('z-index', '2000')
+            $("#visit_all_td_modal").modal("show");
+      },
+      success: function (data) {
+
+        $("#visit_all_td_modal .modal-content").html(data.html_form);
+      }
+              
+    });
+  };
+
+
+   $(".show_all_destructions").off('click').click(specialallForm);
+   $(".new_visit_td_form").off('click').click(specialForm);
+
+
+
+$(document).on('hide.bs.modal','#visit_all_td_modal', function () {
+                                  $('.modal-backdrop').css('z-index', '1000')
+                                  $(document).off('hide.bs.modal','#visit_all_td_modal')
+});
+
+$(document).on('hide.bs.modal','#visit_td_edit_modal', function () {
+                                  $('.modal-backdrop').css('z-index', '1000')
+                                   $(document).off('hide.bs.modal','#visit_td_edit_modal')
+});
+
+var AddAllToVisit = function () {
+    var btn = $(this);
+    $.ajax({
+      url: btn.attr("data-url"),
+      type: 'get',
+      dataType: 'json',
+      success: function (data) {
+                if (data.form_is_fine) {
+          alert("Wykonano");  
+          console.log("test")
+
+          const tooth_table = $("#visit_tooth_modal .modal-content")
+
+                      tooth_table.fadeTo('slow', 0).promise().then(() => {
+                tooth_table.html(data['html_form'])
+                tooth_table.fadeTo('slow', 1)
+      });
+
+        
+                    }
+                    else{
+                      alert("Błędne dane");
+        }
+      }
+              
+    });
+  };
+
+  $(document).on('hide.bs.modal','#visit_tooth_modal', function () {
+
+  $.ajax({
+      url: "{% url 'add_visit_cost' visit_id %}",
+      type: 'get',
+      dataType: 'json',
+      success: function (data) {
+          location.reload()
+                    }
+      });
+
+});
+
+
+var saveToothForm = function () {
+    $.ajax({
+      url: "{% url 'add_visit_cost' visit_id %}",
+      type: 'get',
+      dataType: 'json',
+      success: function (data) {
+          location.reload()
+                    }
+      });
+}
+
+    $(".add_all_visit_tooth_all_td_to_visit").off('click').click(AddAllToVisit)
+    $(".add_all_visit_tooth_all_nh_td_to_visit").off('click').click(AddAllToVisit)
+    $(".add_all_visit_tooth_all_nh_np_td_to_visit").off('click').click(AddAllToVisit)
+    $(".remove_tooth_from_visit").off('click').click(AddAllToVisit)
+    $(".add_tooth_to_visit_btn").off('click').click(specialAddingToothForm)
+    $(".save").off('click').click(saveToothForm)
+
+
+    
+});
+
+
+</script>
+<style>
+    .mb-4, .my-4 {
+    margin-bottom: 0.5rem!important;
+    margin-top: 0.5rem!important;
+}
+
+
+</style>

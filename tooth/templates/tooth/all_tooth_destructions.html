@@ -1,0 +1,182 @@
+    <div class="card">
+      <h3 class="card-header light-blue lighten-1 white-text text-uppercase font-weight-bold text-center py-5">Wszystkie uszkodzenia</h3>
+      <div class="card-body">
+<table class="table table-striped table-hover table-sm table-bordered" class = "tooths">
+  <thead>
+    <tr>
+      <th scope="col">Rodzaj uszkodzeń</th>
+      <th scope="col">Strona</th>
+      <th scope="col">Głębokość</th>
+      <th scope="col">Poziom zęba</th>
+      <th scope="col">Wyleczone</th>
+      <th scope="col">Planowane leczenie</th>
+      <th scope="col">Dodaj</th>
+    </tr>
+  </thead>
+  <tbody>
+
+{% for t, v in tooth_destructions %}
+
+
+    <tr><td>{{t.get_status_display}}</td>
+        <td>{{t.get_side_display}}</td>
+        <td>{{t.depth}}mm</td>
+        <td>{{t.get_front_display}}</td>
+        <td>{{t.healed}}</td>
+        {% if show_all_desructions %}
+         <td>{{t.planned_healing}}</td>
+         {% else %}
+         <td>{{v}}</td>
+         {% endif %}
+         <td>
+    {% if  show_all_destructions %}
+    {% if v == "t" %}
+    <button class="btn btn-sm aqua-gradient btn-block my-4  remove_from_visit" type="button" data-url="{%url 'clear_healingni' t.id visit_id %}" >Usuń z wizyty</button></td>
+    {% else %}
+    <button class="btn btn-sm aqua-gradient btn-block my-4  add_to_visit" type="button" data-url="{%url 'add_td_to_visit' t.id visit_id %}" >Dodaj do wizyty</button></td>
+    {% endif %}
+    {% else %}
+    <button class="btn btn-sm aqua-gradient btn-block my-4  add_new_healing" type="button" data-url="{% url 'add_healing' t.id %}" >Wylecz uszkodzenie</button>    
+    <button class="btn btn-sm aqua-gradient btn-block my-4  healing_history" type="button" data-url="{% url 'healing_history' t.id %}" >Historia Leczenia</button>    
+    <button class="btn btn-sm aqua-gradient btn-block my-4  edit_td" type="button" data-url="{% url 'edit_td' t.id %}" >Edytuj</button>    
+    <button class="btn btn-sm aqua-gradient btn-block my-4  delete_td" type="button" data-url="{% url 'delete_td' t.id %}" >Usuń</button>
+    {% if t.healed %}
+    <button class="btn btn-sm aqua-gradient btn-block my-4  heal_or_destroyed" type="button" data-url="{% url 'heal_or_destroyed' t.id %}" >Zepsute</button>
+    {% else %}        
+    <button class="btn btn-sm aqua-gradient btn-block my-4  heal_or_destroyed" type="button" data-url="{% url 'heal_or_destroyed' t.id %}" >Wyleczone</button>
+    </tr>
+    {% endif %}
+    {% endif %}
+{% endfor %}
+
+</tbody>
+</table>
+    {% if  show_all_destructions %}
+<center>
+                        <button type="button"
+            class="btn btn-sm  btn-info add_all_td_to_visit_btn"
+            data-url="{% url 'add_all_td_to_visit' tooth_id visit_id %}">Dodaj wszystkie do wizyty</button>
+                        <button type="button"
+            class="btn btn-sm  btn-info add_all_nh_td_to_visit_btn"
+            data-url="{% url 'add_all_nh_td_to_visit' tooth_id visit_id %}">Dodaj wszystkie nieleczone do wizyty </button>
+                        <button type="button"
+            class="btn btn-sm btn-info add_all_nh_np_td_to_visit_btn"
+            data-url="{% url 'add_all_nh_np_td_to_visit' tooth_id visit_id %}">Dodaj wszystkie nieleczone i bez zaplanowanego leczenia do wizyty </button></center>
+      {% endif %}
+</div>
+</div>
+<script>
+      $(function () {
+    var AddToVisit = function () {
+    var btn = $(this);
+    $.ajax({
+      url: btn.attr("data-url"),
+      type: 'get',
+      dataType: 'json',
+      success: function (data) {
+                if (data.form_is_fine) {
+        $('.modal-backdrop').css('z-index', '1000')
+
+
+          alert("Wykonano"); 
+          const tooth_table =  $("#td_"+data.tooth+" tbody")
+
+                      tooth_table.fadeTo('slow', 0).promise().then(() => {
+                tooth_table.html(data['html_form'])
+                tooth_table.fadeTo('slow', 1)
+      });
+                                  $("#visit_all_td_modal").modal("hide");
+        
+                    }
+                    else{
+                      alert("Błędne dane");
+        }
+
+
+
+
+
+      
+
+      }
+              
+    });
+  };
+    var specialForm = function () {
+    var btn = $(this);
+    $.ajax({
+      url: btn.attr("data-url"),
+      type: 'get',
+      dataType: 'json',
+      beforeSend: function () {
+              $('.modal-backdrop').css('z-index', '2000')
+            $("#visit_td_edit_modal").modal("show");
+      },
+      success: function (data) {
+
+        $("#visit_td_edit_modal .modal-content").html(data.html_form);
+      }
+              
+    });
+  };
+
+      var HealingHistory = function () {
+    var btn = $(this);
+    $.ajax({
+      url: btn.attr("data-url"),
+      type: 'get',
+      dataType: 'json',
+      beforeSend: function () {
+      },
+      success: function (data) {
+
+        $("#visit_all_td_modal .modal-content").html(data.html_form);
+      }
+              
+    });
+  };
+
+    var specialerForm = function () {
+    var btn = $(this);
+    $.ajax({
+      url: btn.attr("data-url"),
+      type: 'get',
+      dataType: 'json',
+      beforeSend: function () {
+            $("#visit_all_td_modal").modal("hide");
+      },
+      success: function (data) {
+        $("#image").fadeTo('slow', 0).promise().then(() => {
+
+        $("#image").attr('src',"/static/"+data.toothimg);
+ 
+        $("#image").fadeTo('slow', 1)
+
+      });
+      }
+              
+    });
+  };
+
+    $(".add_to_visit").click(AddToVisit)
+    $(".add_new_healing").click(specialForm)
+    $(".healing_history").click(HealingHistory)
+    $(".add_all_td_to_visit_btn").click(AddToVisit)
+    $(".add_all_nh_td_to_visit_btn").click(AddToVisit)
+    $(".add_all_nh_np_td_to_visit_btn").click(AddToVisit)
+    $(".remove_from_visit").click(AddToVisit)
+    $(".edit_td").click(specialForm)
+    $(".delete_td").click(specialerForm)
+    $(".heal_or_destroyed").click(specialerForm)
+  });
+</script>
+
+<style>
+  .mb-4, .my-4 {
+    margin-bottom: 0.5rem!important;
+    margin-top: 0.5rem!important;
+  }
+
+
+</style>
+

@@ -1,0 +1,157 @@
+
+{% load static %}
+
+
+<style type='text/css'>
+
+.toothses {
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
+}
+.huerotate { filter: hue-rotate(180deg); }
+.saturate { filter: saturate(3); }
+.grayscale { filter: grayscale(100%); }
+.contrast { filter: contrast(160%); }
+.brightness { filter: brightness(0.25); }
+.blur { filter: blur(3px); }
+.invert { filter: invert(100%); }
+.sepia { filter: sepia() saturate(10000%) hue-rotate(120deg); }
+.huerotate { filter: hue-rotate(180deg); }
+.rss.opacity { filter: opacity(50%); }
+</style>
+
+
+<div class = "toothses">
+  <h1> Dodaj zęby pacjenta {{patient.First_Name}}  {{patient.Surname}} do wizyty </h1>
+  <br/>
+  <br/>
+
+{% for a,t,in_V in info %}
+<div class="" style="max-width: 20%;max-height: 20%;display: inline-block;">
+{% if a.exists %}
+
+<a class="tooths" id ="tooth_a_{{a.id}}" data-url = "{% url 'add_chosen_tooth' a.id visit %}">
+{% endif %}
+{% if a.side == 'lewy' and a.level == 'górny' %}
+
+ {% if in_V == 't' %}
+
+ <img   class="sepia" id ="{{a.id}}" src="{% static t %}" style="transform: scaleX(-1) rotate(180deg)"alt="logo" width="40" height="56">
+ {% else %}
+ <img class="tooth_img"  id ="{{a.id}}"   src="{% static t %}" style="transform: scaleX(-1) rotate(180deg)"alt="logo" width="40" height="56" >
+ {% endif %}
+{% elif a.side == 'prawy' and a.level == 'górny' %}
+ {% if in_V == 't' %}
+<img class="sepia" id ="{{a.id}}"  src="{% static t %}" style="transform: rotate(180deg)"  alt="logo" width="40" height="50">
+{% else %}
+<img class="tooth_img" id ="{{a.id}}"  src="{% static t %}" style="transform: rotate(180deg)"  alt="logo" width="40" height="50">
+{% endif %}
+{% elif a.side == 'lewy' and a.level == 'dolny' %}
+ {% if in_V == 't' %}
+<img class="sepia" id ="{{a.id}}"   src="{% static t %}"  alt="logo" width="40" height="50">
+{% else %}
+<img class="tooth_img"  id ="{{a.id}}"    src="{% static t %}"  alt="logo" width="40" height="50">
+{% endif %}
+{% elif a.side == 'prawy' and a.level == 'dolny' %}
+ {% if in_V == 't' %}
+<img class="sepia" id ="{{a.id}}"   src="{% static t %}" style="transform: scaleX(-1)"  alt="logo" width="40" height="50">
+{% else %}
+<img class="tooth_img"  id ="{{a.id}}"  src="{% static t %}" style="transform: scaleX(-1)"  alt="logo" width="40" height="50">
+{% endif %}
+{% endif %}
+{% if a.exists %}
+  <figcaption style="font-size:12px"> {{a.number}}<br/>{{a.tooth_type}}<br/>{{a.status}}</figcaption>
+</a>
+{% else %}
+  <figcaption style="font-size:12px"> {{a.number}}<br/>Wyrwany<br/>{{a.tooth_type}}<br/></figcaption>
+{% endif %}
+</div>
+{% if a.side == 'lewy' and a.number == 1 %}
+
+ &nbsp&nbsp&nbsp&nbsp
+ {% endif %}
+ {% if a.side == 'prawy' and a.level == 'górny' and a.number == 8%}
+ <br/>
+ {% endif %}
+{% endfor %}
+
+
+            <center><button type="button" id="add_tooth_to_visit" class="btn btn-info zapisek">Zapisz</button></center><br/>
+</div>
+
+<script type="text/javascript">
+  $(document).off('hide.bs.modal')
+    $(function () {
+    var AddRemoveToothAjax = function () {
+    var btn = $(this);
+    $.ajax({
+      url: btn.attr("data-url"),
+      type: 'get',
+      dataType: 'json',
+
+      success: function (data) {
+        if (data.add == 'True'){
+         $('#'+data.tooth).addClass('sepia')
+        }
+        else{
+         $('#'+data.tooth).removeClass('sepia')
+        }
+
+      }
+              
+    });
+  };
+    $(".tooths").click(AddRemoveToothAjax);
+
+$(document).on('hide.bs.modal','#visit_add_tooth_to_visit_modal', function () {
+  "{% if addtoottovisit %}"
+  console.log("HALO")
+  "{% elif remove %}"
+  $.ajax({
+      url: "{% url 'add_visit_cost' visit %}",
+      type: 'get',
+      dataType: 'json',
+      success: function (data) {
+          location.reload()
+                    }
+      });
+  
+  "{% else %}"
+      var btn = $(this);
+    $.ajax({
+      url: "{% url 'check_tooth_status' visit %}",
+      type: 'get',
+      dataType: 'json',
+      beforeSend: function(){
+      $('.modal-backdrop').css('z-index', '1000')
+      },
+      success: function (data) {
+        console.log("działa?")
+          const tooth_table = $("#visit_tooth_modal .modal-content")
+
+                  tooth_table.fadeTo('slow', 0).promise().then(() => {
+                tooth_table.html(data['html_form'])
+                tooth_table.fadeTo('slow', 1)
+              });
+
+        
+                    }
+
+
+      });
+  "{% endif %}"
+
+
+
+});
+var saveToothForm = function () {
+   $("#visit_add_tooth_to_visit_modal").modal("hide");
+}             
+  $(".zapisek").off('click').click(saveToothForm)
+});
+
+</script>
+
+
+

@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style type='text/css'>
+.form {
+  margin: auto;
+}
+
+.form input, .form select, .form textarea {
+  border-radius: 5px;
+  border: 1px solid #17a2b8;
+  outline: none;
+  background: none;
+  padding: 5px;
+  width: 100%;
+}
+.toothses {
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
+}
+
+</style>
+
+<div class="clearfix">
+  <a class="btn btn-info left" href="{% url 'patients'%}"> Pacjenci </a>
+</div>
+
+<div class = "toothses">
+  <h1> Zęby pacjenta {{patient.First_Name}}  {{patient.Surname}}</h1>
+  <br/>
+  <br/>
+  <p> Wciśnij ząb aby wyświetlić szczegóły</p>
+  <br/>
+  <br/>
+{% for a,t in info %}
+  <div class="" style="max-width: 20%;max-height: 20%;display: inline-block;">
+<a class="tooths" id ="{{a.id}}" href = "{% url  'tooth_info' a.id %}">
+
+{% if a.side == 'lewy' and a.level == 'górny' %}
+
+ <img class="center"  src="{% static t %}" style="transform: scaleX(-1) rotate(180deg)"alt="logo" width="70" height="100"> 
+{% elif a.side == 'prawy' and a.level == 'górny' %}
+<img class="center" src="{% static t %}" style="transform: rotate(180deg)"  alt="logo" width="70" height="100"> 
+{% elif a.side == 'lewy' and a.level == 'dolny' %}
+<img class="center"  src="{% static t %}"  alt="logo" width="70" height="100"> 
+{% elif a.side == 'prawy' and a.level == 'dolny' %}
+<img class="center"  src="{% static t %}" style="transform: scaleX(-1)"  alt="logo" width="70" height="100"> 
+{% endif %}
+</a>
+  <figcaption> {{a.number}}<br/>
+    {% if a.exists %}
+    {% if a.active %}
+    Wyrośnięty
+    {% else %}
+    Nie wyrósł
+    {% endif %}
+<br/>{{a.tooth_type}}<br/>{{a.status}}
+{% else %}
+Brak<br><br><br/> {% endif %}
+</figcaption>
+    
+</div>
+
+{% if a.side == 'lewy' and a.number == 1 %}
+
+ &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp  
+ {% endif %}
+ {% if a.side == 'prawy' and a.level == 'górny' and a.number == 8%}
+ <br/>
+ {% endif %}
+{% endfor %}
+
+
+
+</div>
+
+
+{% endblock %}

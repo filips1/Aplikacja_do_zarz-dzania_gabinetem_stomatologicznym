@@ -1,0 +1,26 @@
+<div class="card">
+      <div class= "card-body">
+    {% if new_td %}
+  <form class="form-signin text-center border border-light p-20 visit_edit_td_form" action="{% url 'new_visit_td' tooth_id visit_id %}" method="post" >{% csrf_token %}
+  <p class="h4 mb-4">Dodaj nowe uszkodzenie</p>
+  {% elif new_td_from_t %}
+  <form class="form-signin text-center border border-light p-20 td_add_form" action="{% url 'new_td' tooth_id %}" method="post" >{% csrf_token %}
+  <p class="h4 mb-4">Dodaj nowe uszkodzenie</p>
+  {% elif on_tooth_url %}
+  <form class="form-signin text-center border border-light p-20 visit_edit_td_form" action="{% url 'edit_td' form.instance.id %}" method="post" >{% csrf_token %}
+  <p class="h4 mb-4">Edytuj uszkodzenia</p>
+  {% else %}
+  <form class="form-signin text-center border border-light p-20 visit_edit_td_form" action="{% url 'edit_visit_td' form.instance.id visit_id%}" method="post" >{% csrf_token %}
+  <p class="h4 mb-4">Edytuj uszkodzenia</p>
+  {% endif %}
+  <table class="form form-table">
+  {{form}}
+  </table>
+  <center>
+    <button class="btn  morpheus-den-gradient btn-block" type="submit">Zapisz</button>
+  </center>
+
+
+
+</form>
+</div></div>

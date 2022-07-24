@@ -1,0 +1,628 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style type='text/css'>
+.form {
+  margin: auto;
+}
+
+.form input, .form select, .form textarea {
+  border-radius: 5px;
+  border: 1px solid #17a2b8;
+  outline: none;
+  background: none;
+  padding: 5px;
+  width: 100%;
+}
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%; /* Could be more or less, depending on screen size */
+}
+
+/* The Close Button */
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+.title{
+  text-align: center;
+  height: 150px;
+}
+.center {
+  background-color: white;
+  width: 300px;
+  height: 300px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+.special{
+  width: 600px;
+  background-color: white;
+}
+input[type=text], select {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+input[type=submit] {
+  width: 100%;
+  background-color: #4CAF50;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.modal-xl{
+  width: 1140px;
+  position: absolute;
+  left: 50%;
+
+  transform: translate(-50%, 0%);
+
+}
+.modal-xxl{
+  width: 1440px;
+  position: absolute;
+  left: 50%;
+
+  transform: translate(-50%, 0%);
+
+}
+
+
+
+input[type=submit]:hover {
+  background-color: #45a049;
+}
+</style>
+<div class="clearfix">
+  <a class="btn btn-info left" href="{% url 'tooth_all_view' tooth.patient.id %}"> Zęby </a>
+</div>
+
+<div class="title">
+        <h1>{{tooth.get_level_display}} {{tooth.get_side_display}} {{tooth.get_number_display}}</h1>
+         <h3> Pacjenta:</h3>
+         <h4>{{tooth.patient.First_Name}} {{tooth.patient.Surname}}</h4>
+</div>
+
+
+
+
+<center>
+  <div class="text-center border border-light p-20 special">
+    <img id="image" src="{% static toothimg %}" usemap= "#workmap"  alt="logo"> 
+
+    <p> Rodzaj zęba: {{tooth.tooth_type}}</p>
+    <p> Stan zęba: {{status}}</p>
+    <p> Wyleczone uszkodzenia: {{fixed}}</p>
+    <p> Niewyleczone uszkodzenia: {{destroyed}}</p>
+    {% if tooth.active %}
+    <p>Wyrośnięty</p>
+    {% else %}
+    <p>Niewyrośnięty</p>
+    {% endif %}
+
+    <br/>
+    <h4>Rentgeny zęba</h4>
+{% for a in images %}
+
+  <div class="" style="max-width: 20%;max-height: 20%;display: inline-block;">
+<img style="  border-radius: 1px; cursor: pointer;transition: 0.3s;object-fit: cover;width:100px;height:100px;" class="img" src="/media/{{a.Image}}"style="width:100%;max-width:300px">
+    <a type="button" href="{% url 'delete_rentgen' a.id %}" class="btn btn-red btn-sm">Usuń</a>
+</div>
+{% endfor %}
+<br/>
+
+    <button type="button" class="btn btn-info show_all_destructions" id="all_Des" data-url="{% url 'check_all_tooth_td' tooth.id%}">Wyświetl uszkodzenia</button>
+    <button type="button" class="btn btn-info" id="add_rentgen" data-toggle="modal" data-target="#rentgen_modal">Dodaj rentgen</button><br/>
+
+    <button type="button" class="btn btn-info " id="add_dest"  data-url="{%  url 'new_td' tooth.id %}">Dodaj uszkodzenie</button>
+        {% if tooth.active %}
+      <a type="button" class="btn btn-info " id="add_dest"  href="{%  url 'change_active' tooth.id %}">Zmień na niewyrośnięty</a>
+    {% else %}
+      <a type="button" class="btn btn-info " id="add_dest"  href="{%  url 'change_active' tooth.id %}">Zmień na wyrośnięty</a>
+    {% endif %}
+    <br/>
+    <a  class="btn btn btn-dark-green " id="healing"  data-url = "{% url 'tooth_all_heal' 'all' tooth.id %}">Wyleczony</a>
+    <button type="button" class="btn btn btn-light-green "   id="delete_tooth"  data-url="{%  url 'delete_tooth' tooth.id %}">Wyrwij ząb</button>
+
+    <button type="button" class="btn btn btn-light-green "   id="revive_tooth"  data-url="{%  url 'delete_tooth' tooth.id %}">Przywróć ząb</button>
+    {% if tooth.tooth_type == "stały" and tooth.patient.age < 14 and tooth.number < 6 %}
+      <a type="button" class="btn btn-info " id="add_dest"  href="{%  url 'return_mleczny' tooth.id %}">Przywróć/Ustaw na mleczny</a>
+      {% endif %}
+
+</div>
+    <!--<p> Szczegóły odnośnie uszkodzeń w danej części zęba można sprawdzić wciskając część zęba która cię interesuję</p> -->
+</center>
+
+
+
+
+
+<map name="workmap">
+  <area shape="rect" coords="24,9,59,83" alt="lg" href="#"  id = "1">
+  <area shape="rect" coords="21,83,53,129" alt="lg" href="#"  id = "2">
+  <area shape="rect" coords="13,129,40,177" alt="lg" href="#"  id = "25">
+  <area shape="rect" coords="60,13,111,83" alt="lg" href="#" id = "3">
+  <area shape="rect" coords="53,83,93,128" alt="lg" href="#"  id = "4">
+  <area shape="rect" coords="41,129,81,177" alt="lg" href="#"  id = "45">
+</map>
+
+        <div id="myModal" class="modal">
+          <div class="modal-dialog modal-lg">
+
+ <div class="modal-content">
+    <span class="close">&times;</span>
+    <center>
+    <h3 id="main"style=" margin-left: auto; margin-right: auto;"></h3>
+    <h4 id="more"style=" margin-left: auto; margin-right: auto;"></h4>
+
+          <button type="button" class="btn btn-info " data-url = "#" id="uszko_btn"  >Wyświetl uszkodzenia</button>
+
+     <button  type="button" class="btn btn-info " data-url="{%  url 'new_td' tooth.id %}" id="add_new_dest" >Dodaj uszkodzenie</button>
+      <br/>
+          <a   class="btn btn btn-dark-green " data-url="#" id="healing_side">Wyleczony</a>
+
+        </center>
+  </div>
+</div>
+</div>
+<div id="rentgen_modal" class="modal" style="z-index: 1400;">
+  <div class="modal-dialog">
+
+ <div class="modal-content">
+<form method="post"class="add_rentgen_form" enctype="multipart/form-data">
+  {% csrf_token %}
+  <table class="form form-table">
+      {{form}}
+    <tr><td colspan="2"><button type="submit" class="btn btn-info right"> Zatwierdź </button></td></tr>
+  </table>
+</form>
+</div>
+</div>
+</div>
+
+
+    <div class="modal fade " id="visit_td_edit_modal" style=" 
+   z-index: 3000; ">
+    <div class="modal-dialog" style=" 
+   z-index: 3000; ">
+      <div class="modal-content"  style=" 
+   z-index: 3000; ">
+      </div>
+    </div>
+  </div>
+
+    <div class="modal fade " id="visit_all_td_modal"style=" 
+   z-index: 1500; ">
+    <div class="modal-dialog modal-lg"style=" 
+   z-index: 1500; ">
+      <div class="modal-content"style=" 
+   z-index: 1500; ">
+      </div>
+    </div>
+  </div>
+
+
+<div id="myModalimg" class="modal modas"style="z-index: 1400;">
+  <img class="modal-content" id="img01">
+  <div id="caption"></div>
+</div>
+
+
+
+<script type="text/javascript">
+
+
+$(document).ready(function() {
+
+
+  var modal = document.getElementById("myModalimg");
+
+// Get the image and insert it inside the modal - use its "alt" text as a caption
+    var modalImg = document.getElementById("img01");
+    var captionText = document.getElementById("caption");
+
+
+    var image = function(){
+        $("#myModalimg").modal("show");
+        modalImg.src = this.src;
+        captionText.innerHTML = this.alt;
+    }
+
+
+$("#id_Image").val(null);
+
+"{% if tooth.exists %}"
+$('#revive_tooth').hide()
+"{% else %}"
+$('#add_dest,#healing,#delete_tooth, #add_new_dest,#healing_side, #remove_td ').hide()
+"{% endif %}"
+    var specialallForm = function () {
+    var btn = $(this);
+    $.ajax({
+      url: btn.attr("data-url"),
+      type: 'get',
+      dataType: 'json',
+      beforeSend: function () {
+            $('.modal-backdrop').css('z-index', '2000')
+            $("#visit_all_td_modal").modal("show");
+      },
+      success: function (data) {
+
+        $("#visit_all_td_modal .modal-content").html(data.html_form);
+                console.log(data)
+      }
+              
+    });
+  };
+
+    var specialallFormOther = function () {
+    var btn = $(this);
+    $.ajax({
+      url: btn.attr("data-url"),
+      type: 'get',
+      dataType: 'json',
+      beforeSend: function () {
+            $('.modal-backdrop').css('z-index', '2000')
+            $("#visit_td_edit_modal").modal("show");
+      },
+      success: function (data) {
+
+        $("#visit_td_edit_modal .modal-content").html(data.html_form);
+        console.log(data)
+      }
+              
+    });
+  };
+
+  var secsaveForm = function () {
+    var form = $(this);
+    $.ajax({
+
+      url: form.attr('action'),
+      data: form.serialize(),
+      type: form.attr("method"),
+      dataType: 'json',
+      success: function (data) {
+        if (data.form_is_fine) {
+
+          $("#visit_td_edit_modal").modal("hide")
+          $('.modal-backdrop').css('z-index', '1000')
+          alert("Wykonano");
+               $("#image").fadeTo('slow', 0).promise().then(() => {
+
+                $("#image").attr('src',"/static/"+data.toothimg);
+ 
+                $("#image").fadeTo('slow', 1)
+
+      });
+        
+                    }
+                    else{
+                      alert("Błędne dane");
+        }
+
+
+
+
+
+      }
+    });
+    return false;
+  };
+  var thsaveForm = function () {
+    var form = $(this);
+    $.ajax({
+
+      url: form.attr('action'),
+      data: form.serialize(),
+      type: form.attr("method"),
+      dataType: 'json',
+      success: function (data) {
+        if (data.form_is_fine) {
+        $("#visit_all_td_modal .modal-content").html(data.html_form);
+          $("#visit_td_edit_modal").modal("hide")
+          $('.modal-backdrop').css('z-index', '1000')
+
+ 
+               
+        
+                    }
+                    else{
+                      alert("Błędne dane");
+        }
+
+
+
+
+
+      }
+    });
+    return false;
+  };
+
+
+
+
+$(document).on('hide.bs.modal','#visit_all_td_modal', function () {
+                                  $('.modal-backdrop').css('z-index', '1000')
+
+});
+
+$(document).on('hide.bs.modal','#visit_td_edit_modal', function () {
+                                  $('.modal-backdrop').css('z-index', '1000')
+
+});
+
+  var deleteForm = function () {
+    var btn = $(this);
+  if(confirm("Czy na pewno chcesz usunąć ząb")){
+    $.ajax({
+
+      url: btn.attr("data-url"),
+      type: 'get',
+      dataType: 'json',
+      beforeSend: function () {
+
+      },
+      success: function (data) {
+          alert("Wykonano");
+               $("#image").fadeTo('slow', 0).promise().then(() => {
+
+                $("#image").attr('src',"/static/"+data.toothimg);
+ 
+                $("#image").fadeTo('slow', 1)
+                $('#add_dest,#healing,#delete_tooth, #add_new_dest,#healing_side, #remove_td').hide()
+                $('#revive_tooth').show()
+
+      });
+        
+
+
+
+
+
+
+      }
+    });}
+    return false;
+  };
+
+  var revive = function () {
+    var btn = $(this);
+  if(confirm("Czy na pewno chcesz przywrócić uprzednio usunięty ząb")){
+    $.ajax({
+
+      url: btn.attr("data-url"),
+      type: 'get',
+      dataType: 'json',
+      beforeSend: function () {
+
+      },
+      success: function (data) {
+          alert("Wykonano");
+               $("#image").fadeTo('slow', 0).promise().then(() => {
+
+                $("#image").attr('src',"/static/"+data.toothimg);
+ 
+                $("#image").fadeTo('slow', 1)
+                $('#add_dest,#healing,#delete_tooth, #add_new_dest,#healing_side, #remove_td').show()
+                $('#revive_tooth').hide()
+
+      });
+        
+
+
+
+
+
+
+      }
+    });}
+    return false;
+  };
+
+  var healingForm = function () {
+    var btn = $(this);
+    console.log(btn.attr("data-url"))
+  if(confirm("Czy jesteś pewien że wszystkie uszkodzenia są wyleczone?")){
+
+    $.ajax({
+
+      url: btn.attr("data-url"),
+      type: 'get',
+      dataType: 'json',
+      beforeSend: function () {
+
+      },
+      success: function (data) {
+          alert("Wykonano");
+               $("#image").fadeTo('slow', 0).promise().then(() => {
+
+                $("#image").attr('src',"/static/"+data.toothimg);
+ 
+                $("#image").fadeTo('slow', 1)
+
+      });
+        
+
+
+
+
+
+
+      }
+    });}
+    return false;
+  };
+
+
+   $(".show_all_destructions").click(specialallForm);
+   $("#uszko_btn").click(specialallForm);
+  $("#add_dest").click(specialallFormOther);
+  $("#add_new_dest").click(specialallFormOther);
+  $("#visit_td_edit_modal").on("submit", ".new_healing_form", secsaveForm); 
+  $("#visit_td_edit_modal").on("submit", ".td_add_form", secsaveForm);  
+  $("#visit_td_edit_modal").on("submit", ".visit_edit_td_form", secsaveForm);  
+  $("#visit_td_edit_modal").on("submit", ".edit_healing_form", thsaveForm);  
+  $("#delete_tooth").click(deleteForm);
+  $("#healing").click(healingForm);
+  $("#healing_side").click(healingForm);
+  $("#revive_tooth").click(revive);
+  $(".img").click(image);
+
+
+
+
+   $("area").click(function() {
+    var btn3 = document.getElementById("healing_side");
+    var image = document.getElementById('image');
+    console.log(image.src);                                // http://www.w3schools.com/js/pic_bulbon.gif
+    console.log(image.src.match("word-not-in-src-name"));  // null
+    // Get the modal
+    $("input[name=side]").val("left")
+    var txt = document.getElementById('main');
+    var more = document.getElementById('more');
+    var areaId = $(this).attr("id");
+          a = 0
+          b=0
+    if (areaId == 1){
+      $("#healing_side").attr('data-url',"{% url 'tooth_all_heal' 'left' tooth.id %}");
+      $("#uszko_btn").attr('data-url',"{% url 'tooth_side_destructions' 'left' tooth.id %}");
+ 
+      txt.innerHTML = "Lewa wierzchnia część zęba"
+      more.innerHTML = "Szczegóły "
+
+
+
+      if ((document.getElementById('id_side'))!= null){
+        document.getElementById('id_side').value = 'left';
+        document.getElementById('id_status').value = 1;
+      }
+    }
+    else if (areaId == 2){
+      $("#healing_side").attr('data-url',"{% url 'tooth_all_heal' 'leftkorz' tooth.id %}");
+      $("#uszko_btn").attr('data-url',"{% url 'tooth_side_destructions' 'leftkorz' tooth.id %}");
+      txt.innerHTML = "lewy korzeń"
+
+
+
+      if ((document.getElementById('id_side'))!= null){
+        document.getElementById('id_side').value = 'left';
+        document.getElementById('id_status').value = 4;
+      }
+    }
+     else if (areaId == 25){
+      $("#healing_side").attr('data-url',"{% url 'tooth_all_heal' 'leftkorz' tooth.id %}");
+      $("#uszko_btn").attr('data-url',"{% url 'tooth_side_destructions' 'leftkorzlow' tooth.id %}");
+      txt.innerHTML = "Dolna część lewego korzenia"
+
+
+
+
+      if ((document.getElementById('id_side'))!= null){
+        document.getElementById('id_side').value = 'left';
+        document.getElementById('id_status').value = 5;
+      }
+    }
+    else if (areaId == 3){
+      txt.innerHTML = "Prawa wierzchnia część"
+      $("#healing_side").attr('data-url',"{% url 'tooth_all_heal' 'right' tooth.id %}");
+      $("#uszko_btn").attr('data-url',"{% url 'tooth_side_destructions' 'right' tooth.id %}");
+  
+
+      if ((document.getElementById('id_side'))!= null){
+        document.getElementById('id_side').value = 'right';
+        document.getElementById('id_status').value = 1;
+      }
+    }
+    else if (areaId == 4){
+      txt.innerHTML = "Prawy korzeń"
+      $("#healing_side").attr('data-url',"{% url 'tooth_all_heal' 'rightkorz' tooth.id %}");
+      $("#uszko_btn").attr('data-url',"{% url 'tooth_side_destructions' 'rightkorz' tooth.id %}");
+
+      if ((document.getElementById('id_side'))!= null){
+        document.getElementById('id_side').value = 'right';
+        document.getElementById('id_status').value = 4;
+      }
+    }
+         else if (areaId == 45){
+      txt.innerHTML = "Dolna część prawego korzenia"
+      $("#healing_side").attr('data-url',"{% url 'tooth_all_heal' 'rightkorz' tooth.id %}");
+      $("#uszko_btn").attr('data-url',"{% url 'tooth_all_heal' 'rightkorzlow' tooth.id %}");
+
+      if ((document.getElementById('id_side'))!= null){
+        document.getElementById('id_side').value = 'right';
+        document.getElementById('id_status').value = 5;
+      }
+    }
+
+
+
+       
+      
+ 
+
+             var modal = document.getElementById("myModal");
+
+    var spans = document.getElementsByClassName("close");
+    console.log(spans.length); 
+    // When the user clicks on <span> (x), close the modal
+    for (i=0;i<spans.length;i++){
+      var span = document.getElementsByClassName("close")[i];
+      span.onclick = function() {
+        modal.style.display = "none";
+      }
+    }
+    modal.style.display = "block";
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }      
+    
+  });
+ });
+
+</script>
+{% endblock %}

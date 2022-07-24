@@ -1,0 +1,11 @@
+<!--     {% if toot.number == 1 %}
+        {%if toot.side == "prawy"%}
+            &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+        {% endif %}
+
+    {% if toot.number == 8 %}
+        {%if toot.side == "prawy"%}
+            <br/>
+        {% endif %}
+    {% endif %}
+-->

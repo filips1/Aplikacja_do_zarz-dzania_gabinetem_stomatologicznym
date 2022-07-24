@@ -1,0 +1,72 @@
+{% load chartkick %}
+    <div class="card">
+      <h3 class="card-header light-blue lighten-1 white-text text-uppercase font-weight-bold text-center py-5">Propozycja leczenia</h3>
+      <div class="card-body">
+        {% if this_td_has_proposition %}
+        <h5 class=" lighten-1 text-uppercase font-weight-bold text-center py-2">Popularność sposobów leczenia tego uszkodzenia na podstawie histori leczenia tego uszkodzenia</h5>
+
+        {% pie_chart only_this_destruction %}
+        <div class="text-center">Według poprzednich leczeń najpopularniejszym sposobem leczenia tego uszkodzenia jest:<br/> <b>{{this_td_prop}}</b> </div><br/>
+      <button class="btn btn-sm aqua-gradient btn-block my-4  update_healing_type" type="button" data-url="{% url 'update_healing_type' td.id this_td_prop visit.id %}" >Zapisz zaproponowane leczenie</button>
+        {% endif %}
+        
+        {% if this_tooth_has_proposition %}
+        <h5 class=" lighten-1 text-uppercase font-weight-bold text-center py-2">Popularność sposobów leczenia tego uszkodzenia na podstawie histori leczenia tego typu uszkodzeń w tym zębie</h5>
+                {% pie_chart all_tooth_destructions %}
+        <div class="text-center">Według poprzednich leczeń najpopularniejszym sposobem leczenia tego uszkodzenia jest:<br/> <b>{{this_tooth_prop}}</b> </div><br/>
+              <button class="btn btn-sm aqua-gradient btn-block my-4  update_healing_type" type="button" data-url="{% url 'update_healing_type' td.id this_tooth_prop visit.id %}" >Zapisz zaproponowane leczenie</button>        
+        {% endif %}
+        {% if all_this_tooth_number_has_proposition %}
+                <h5 class=" lighten-1 text-uppercase font-weight-bold text-center py-2">Popularność sposobów leczenia tego uszkodzenia na podstawie histori leczenia tego typu uszkodzeń we wszystkich  zębach z danym numerem</h5>
+                        {% pie_chart all_tooth_numbers %}
+              <div class="text-center">Według poprzednich leczeń najpopularniejszym sposobem leczenia tego uszkodzenia jest:<br/> <b>{{all_tooth_with_this_number_prop}}</b> </div><br/> 
+                    <button class="btn btn-sm aqua-gradient btn-block my-4  update_healing_type" type="button" data-url="{% url 'update_healing_type' td.id all_tooth_with_this_number_prop visit.id %}" >Zapisz zaproponowane leczenie</button>       
+        {% endif %}
+        
+
+
+</div>
+</div>
+
+<script type="text/javascript">
+  $(function () {
+    var UpdateHealing = function () {
+    var btn = $(this);
+    $.ajax({
+      url: btn.attr("data-url"),
+      type: 'get',
+      dataType: 'json',
+      success: function (data) {
+                if (data.form_is_fine) {
+        $('.modal-backdrop').css('z-index', '1000')
+
+
+          alert("Wykonano"); 
+          const tooth_table =  $("#td_"+data.tooth+" tbody")
+
+                      tooth_table.fadeTo('slow', 0).promise().then(() => {
+                tooth_table.html(data['html_form'])
+                tooth_table.fadeTo('slow', 1)
+      });
+                                  $("#visit_all_td_modal").modal("hide");
+        
+                    }
+                    else{
+                      alert("Błędne dane");
+        }
+
+
+
+
+
+      
+
+      }
+              
+    });
+  };
+    $(".update_healing_type").click(UpdateHealing)
+  });
+
+
+</script>

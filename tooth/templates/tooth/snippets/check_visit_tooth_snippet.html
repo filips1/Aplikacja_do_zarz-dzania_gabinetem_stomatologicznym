@@ -1,0 +1,151 @@
+
+{% for t in tooth_destructions %}
+{% if t.tooth_destructions.tooth == a %}
+    <tr><td>{{t.tooth_destructions.get_status_display}}</td>
+        <td>{{t.tooth_destructions.get_side_display}}</td>
+        <td>{{t.tooth_destructions.depth}}mm</td>
+        <td>{{t.tooth_destructions.get_front_display}}</td>
+        <td>{{t.tooth_destructions.healed}}</td>
+         <td> 
+
+
+<form method="post" class="visit_new_create_form">{% csrf_token %}
+<div style="display: flex; justify-content: space-around">
+      <!-- Email -->
+
+      <div class="md-form" style=" margin-left: 0px; margin-top: 0rem; margin-bottom: 0rem;">
+        Sposób leczenia
+    <label for="inputtypeof" class="sr-only">Login</label>
+      <select id="inputtypeof{{t.id}}" name="type_of" value="{{t.type_of}}">
+    <option value ="{{t.type_of}}"selected hidden>{{t.type_of}}</option>
+    <option value="kanałowe">kanałowe</option>
+    <option value="plomba">plomba</option>
+    <option value="czyszczenie">czyszczenie</option>
+    <option value="leczenie długotrwałe">leczenie długotrwałe</option>
+    <option value="lekarstwo">lekarstwo</option>
+    <option value="operacja">operacja</option>
+    <option value="inne">inne</option>
+  </select>
+
+      </div>
+      <!-- Password -->
+      <div class="md-form" style=" margin-left: 2px;  margin-top: 0rem; margin-bottom: 0rem;">
+        Opis leczenia
+        <label for="about_healing" class="sr-only">Opis leczenia</label>
+
+        {% if t.about_healing == None %}
+        <textarea rows="4" cols="50" id="about_healing{{t.id}}" name = "about_healing" class="form-control" placeholder="Opis leczenia"></textarea>
+        {% else %}
+
+      <textarea rows="4" cols="50" id="about_healing{{t.id}}" name = "about_healing" class="form-control" placeholder="Opis leczenia">{{t.about_healing}} </textarea>
+      {% endif %}
+  </div>
+  <div class="buttons" align="left" style=" margin-left: 10px; margin-right: 10px; margin-top: -1rem; margin-bottom: -1rem;">
+ 
+      <!-- Sign in button -->
+      <button class="btn btn-sm aqua-gradient btn-block my-4  spec_btn" type="submit" formaction="{% url 'tooth_update_destructions_status' t.id %}" >Zapisz leczenie</button>
+      <button class="btn btn-sm aqua-gradient btn-block my-4 remove_from_visit" type="button" data-url="{% url 'clear_healing' t.id  %}" >Nie lecz</button>
+      <button class="btn btn-sm aqua-gradient btn-block my-4  edit_visit_td" type="button"data-url="{% url 'edit_visit_td' t.tooth_destructions.id t.visit.id %}" >Edytuj uszkodzenie</button>
+      <button class="btn btn-sm aqua-gradient btn-block my-4  healing_history" type="button"data-url="{% url 'healing_history' t.tooth_destructions.id %}" >Historia leczenia</button>
+  </div>
+</div>
+</form>
+</td>
+    </tr>
+{% endif %}
+{% endfor %}
+<script type="text/javascript">
+
+    $(function () {
+    var remove_from_visit = document.getElementsByClassName("remove_from_visit")
+Array.prototype.forEach.call(remove_from_visit, function(del) {
+
+
+
+    del.onclick = function () {
+    var btn = $(this);
+    console.log(btn.attr("data-url"))
+    console.log(btn)
+    $.ajax({
+      url: btn.attr("data-url"),
+      type: 'get',
+      dataType: 'json',
+            beforeSend: function () {
+
+            },
+      success: function (data) {
+        if (data.form_is_fine) {
+
+          alert("Wykonano");  // <-- This is just a placeholder for now for testing
+          const tooth_table =  $("#td_"+data.tooth+" tbody")
+                      tooth_table.fadeTo('slow', 0).promise().then(() => {
+                // replace the HTML contents
+                tooth_table.html(data['html_form'])
+                // fade-too the div with new contents
+                tooth_table.fadeTo('slow', 1)
+      });
+                    }
+
+
+
+
+
+      }
+    });
+    return false;
+  };
+});
+
+
+    var show_modal_td = function () {
+    var btn = $(this);
+    $.ajax({
+      url: btn.attr("data-url"),
+      type: 'get',
+      dataType: 'json',
+        beforeSend: function () {
+
+             $('.modal-backdrop').css('z-index', '2000')
+            $("#visit_td_edit_modal").modal("show");
+      },
+      success: function (data) {
+        $("#visit_td_edit_modal .modal-content").html(data.html_form);
+      }
+                    
+
+
+
+
+
+      
+    });
+    return false;
+  };
+
+      var healing_history = function () {
+    var btn = $(this);
+    $.ajax({
+      url: btn.attr("data-url"),
+      type: 'get',
+      dataType: 'json',
+      beforeSend: function () {
+              $('.modal-backdrop').css('z-index', '2000')
+            $("#visit_all_td_modal").modal("show");
+      },
+      success: function (data) {
+
+        $("#visit_all_td_modal .modal-content").html(data.html_form);
+      }
+              
+    });
+    return false;
+  };
+
+    $(".edit_visit_td").click(show_modal_td)
+    $(".healing_history").click(healing_history)
+    $(".proposition_of_healing").click(healing_history)
+
+});
+
+</script>
+

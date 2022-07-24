@@ -1,0 +1,32 @@
+{% load static %}
+<center>
+  <div class="text-center border border-light p-20 special">
+    <img id="image" src="/static/{{toothimg}}" usemap= "#workmap"  alt="logo"> 
+    <p> Status zęba:
+    {% if destroyed %}
+    uszkodzony
+    {% else %}
+  zdrowy
+    {% endif %}
+  </p>
+  <div class="title">
+        <h1>{{tooth.get_level_display}} {{tooth.get_side_display}} {{tooth.get_number_display}}</h1>
+         <h3> Pacjenta:</h3>
+         <h4>{{tooth.patient.First_Name}} {{tooth.patient.Surname}}</h4>
+</div>
+<div class="text-center border border-light p-20 special">
+    <img id="image" src="{% static toothimg %}" usemap= "#workmap"  alt="logo"> 
+    <p> Status zęba:
+    {% if destroyed %}
+    uszkodzony
+    {% else %}
+  zdrowy
+    {% endif %}
+  </p>
+
+    <p> Rodzaj zęba: {{tooth.tooth_type}}
+
+
+</div>
+    <!--<p> Szczegóły odnośnie uszkodzeń w danej części zęba można sprawdzić wciskając część zęba która cię interesuję</p> -->
+</center>

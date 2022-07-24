@@ -1,0 +1,116 @@
+    <div class="card">
+      <h3 class="card-header light-blue lighten-1 white-text text-uppercase font-weight-bold text-center py-5">Historia Leczenia</h3>
+      <div class="card-body">
+{% if tooth_url %}
+<table class="table table-striped  tablehh table-hover table-sm table-bordered" style="max-width = 1000px;"class = "heling_history">
+{% else %}
+<table class="table table-striped  tablehh table-hover table-sm table-bordered" style="max-width = 1000px;"class = "heling_history">
+{% endif %}
+  <thead>
+    <tr>
+      <th scope="col" width="20%">Data wyleczenia</th>
+      <th scope="col" width="17%">Sposób leczenia</th>
+      {% if tooth_url %}
+      <th scope="col" width="40%">Opis</th>
+      <th scope="col" width="23%">Edytuj, Usuń</th>
+      {% else %}
+      <th scope="col" width="63%">Opis</th>
+      {% endif %}
+    </tr>
+  </thead>
+  <tbody>
+{% for t in th %}
+
+    <tr>
+      {% if t.visit == None %}
+      <td>{{t.date_of_fixing.date}}</td>
+      {% else %}
+      <td>{{t.visit.day_of_visit}} {{t.visit.time_end_visit}}</td>
+      {% endif %}
+        <td>{{t.type_of}}</td>
+        <td>{{t.about_healing}}</td>
+        {% if tooth_url %}
+        <td>
+
+        {% if t.visit.Dentist == dentist or t.dentist == dentist %}
+
+          <center>
+        <button  type="button" class="btn btn-sm btn-info edit_hh " data-url="{% url 'edit_healing' t.id %}"  >Edytuj</button>
+        <button  type="button" class="btn btn-sm btn-info delete_hh " data-url="{% url 'remove_healing' t.id %}"  >Usuń</button></center>
+        {% endif %}
+
+        </td>
+        {% endif %}
+        </tr>
+      
+{% endfor %}
+</tbody>
+</table>
+</tr>
+</div>
+</div>
+<style>   table.wrapping td, .break-word {
+      white-space: normal !important;
+      word-wrap: break-word;
+      max-width: 1px;
+   }
+      tablehh {
+      table-layout:fixed;
+      width:100%;
+   }
+
+
+  .mb-4, .my-4 {
+    margin-bottom: 0.5rem!important;
+    margin-top: 0.5rem!important;
+  }
+
+
+
+</style>
+
+<script type="text/javascript">
+        $(function () {
+
+    var specialForm = function () {
+    var btn = $(this);
+    $.ajax({
+      url: btn.attr("data-url"),
+      type: 'get',
+      dataType: 'json',
+      beforeSend: function () {
+              $('.modal-backdrop').css('z-index', '2000')
+            $("#visit_td_edit_modal").modal("show");
+      },
+      success: function (data) {
+
+        $("#visit_td_edit_modal .modal-content").html(data.html_form);
+      }
+              
+    });
+  };
+
+      var DeleteHealing = function () {
+    var btn = $(this);
+    $.ajax({
+      url: btn.attr("data-url"),
+      type: 'get',
+      dataType: 'json',
+
+      success: function (data) {
+
+        $("#visit_all_td_modal .modal-content").html(data.html_form);
+      }
+              
+    });
+  };
+
+    $(".edit_hh").click(specialForm)
+    $(".delete_hh").click(DeleteHealing)
+
+
+
+});
+
+
+</script>
