@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style type="text/css">
+.form-signin {
+  width: 100%;
+  max-width: 600px;
+  padding: 15px;
+  margin: auto;
+  text-align: center;
+}
+</style>
+
+
+
+
+
+<form class="form-signin" method="post">{% csrf_token %}
+<div class="card">
+
+  <h5 class="card-header info-color white-text text-center py-4">
+    <strong>Zaloguj się</strong>
+  </h5>
+
+
+  <div class="card-body px-lg-5 pt-0">
+
+    <!-- Form -->
+    <form class="text-center" style="color: #757575;" action="#!">
+
+      <!-- Email -->
+      <div class="md-form">
+    <label for="inputusername" class="sr-only">Login</label>
+    <input type="username" name="username" id="inputusername" class="form-control" placeholder="Username" required autofocus>
+      </div>
+
+      <div class="md-form">
+        <label for="inputPassword" class="sr-only">Password</label>
+    <input type="password" id="inputPassword" name = "password" class="form-control" placeholder="Password" required>
+      </div>
+
+
+{% for field in login_form %}
+        {% for error in  field.errors %}
+            <small style="color: red;">{{error}}</small>
+        {% endfor %}
+    {% endfor %}
+
+    {% if login_form.non_field_errors %}
+        <div style = "color:red;">
+            <p>{{login_form.non_field_errors}}</p>
+        </div>
+    {% endif %}
+
+      <button class="btn aqua-gradient btn-block my-4 " type="submit">Zaloguj się</button>
+
+
+      <p>Nie masz konta
+        <a href="{% url 'register' %}">Zarejestruj się</a>
+      </p>
+
+
+    </form>
+=
+
+  </div>
+
+</div>
+</form>
+
+{% endblock content %}

@@ -1,0 +1,261 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+{% include 'account/snippets/css.html' %}
+
+
+
+<div class="container" >
+  
+  <div class = "row">
+
+    <div class="left-column col-lg-12 offset-lg-0">
+
+        <div class = "card m-auto d-flex flex-column p-5">
+            <img src="/media/{{ dentist.account.profile_pic }}" class="rounded-circle z-depth-0"
+            alt="avatar image" width=150 height=150 style=" margin-left: auto; margin-right: auto;">
+            <h1  style=" margin-left: auto; margin-right: auto;"><b>{{dentist.First_Name}} {{dentist.Surname}}</b></h1>
+        </div>
+      </div>
+    </div>
+</div>
+<div class="container">
+  <div class = "row">
+    <div class="left-column col-lg-10 offset-lg-1">
+
+      <div style=" margin-left: auto; margin-right: auto;" class = "card m-auto d-flex flex-column p-3">
+    <a style=" margin-left: auto; margin-right: auto;"><span class = "lead"><i class="fa fa-map-marker fa-2x"></i>  {{dentist.city}} - {{dentist.clinic_adress}}</span></a>
+    {% if user.is_authenticated %}
+    {% if not is_d %}
+    <center>
+      <a class = "btn btn-primary" style="width: 40%"href = "{% url 'chat' dentist.account.username %} ">Rozmowa</a>
+    {% endif %}
+    {% endif %}
+      </div>
+    
+    </div>
+  </div>
+  <div class = "row">
+    <div class="left-column col-lg-5 offset-lg-1  ">
+      <div class = "testowe">
+        <div class = "card m-auto d-flex flex-column p-3">
+          <div class = "about_me_neue">
+            {% include 'account/snippets/profile/about_me.html' %}
+          </div>
+          {% include 'account/snippets/images.html' %}
+          {% if is_d %}
+            <button type="button" class = "btn btn-primary add_about_me_btn"  data-url = "{% url 'add_about_me'%}">Dodaj/Edytuj opis </button>
+            <a class = "btn btn-primary" data-toggle="modal" data-target="#image_form_modal">Dodaj zdjęcia</a>
+          {% endif %}
+        </div>
+        <div id="image_form_modal" class="modal" style="z-index: 1400;">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <table class="form form-table">
+                  {{img_form}}
+                  <tr><td colspan="2"><button type="submit" class="btn btn-info right"> Zatwierdź </button></td></tr>
+                </table>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    <div class = "testowe">
+      <div class = "card m-auto d-flex flex-column p-3">
+        <h4>Historia zabiegów</h4>
+        <p> Liczba wizyt:{{no_of_visits}} </p>
+        <p> Liczba wykonanych zabiegów: {{no_of_healing}}</p>
+        <p> Leczyłem {{no_of_patients}} osób </p>
+           
+      </div>
+    </div>
+    <div class = "testowe">
+      <div class = "card m-auto d-flex flex-column p-3">
+        <div class = "achievements_div">
+          {% include 'account/snippets/profile/achievements.html' %}
+        </div>
+        {% if is_d %}
+          <a class = "btn btn-primary add_achievements_btn" data-url = "{% url 'add_achievements' %}">Dodaj Osiągnięcia</a>
+        {% endif %}           
+      </div>
+    </div>
+    <div class = "testowe">
+      <div class = "card m-auto d-flex flex-column p-3">
+        <div class = "specialisation_div">
+          {% include 'account/snippets/profile/specialisation.html' %}
+        </div>
+        {% if is_d %}
+          <a class = "btn btn-primary add_specialisation" data-url = "{% url 'add_specialisation' %}">Dodaj Specjalizację</a>
+        {% endif %}  
+      </div>
+    </div>
+    </div>
+    <div class="left-column col-lg-5 ">
+      <div class = "testowe">
+        <div class = "card m-auto d-flex flex-column p-3">
+          <h4>Informacje</h4>
+          <p> Adres: {{dentist.city}}, {{dentist.clinic_adress}}</p>
+          <p> Telefon: {{dentist.phone_number}}</p>
+          <p> Email: {{dentist.account.email}}</p>     
+        </div>
+      </div>
+      <div class = "testowe">
+        <div class = "card m-auto d-flex flex-column p-3">
+          <h4>Moja Lokalizacja</h4>
+          {% for l in location %}
+          <div id='map{{l.id}}' style='width: 425px; height: 427px;'></div>
+            <a class = "btn btn-primary" href = "{% url 'clinic_location_info' l.id %}">Szczegóły lokalizacji</a>
+        
+            {% if is_d %}
+          <a class = "btn btn-primary" href = "{% url 'location_add' l.id %}">Edytuj Lokalizację</a>  
+          {% endif %}
+        {% endfor %}
+          {% if is_d %}
+            <a class = "btn btn-primary" href = "{% url 'location_add' %}">Dodaj nową Lokalizację</a>
+          {% endif %}
+      </div>
+      </div>
+      <div class = "testowe">
+        <div class = "card m-auto d-flex flex-column p-3">
+          <h4>Komentarze</h4>
+           <!--Section: Comments-->
+          <section class="my-5">
+          <!-- Card header -->
+            <div class= "comments_div">
+              {% include 'account/snippets/profile/comments.html' %}
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="ajax_modal">
+  <div class="modal-dialog" style="position: relative">
+    <div class="modal-content">
+    </div>
+  </div>
+</div>
+
+
+<script>
+$(function () {
+
+  var loadForm = function () {
+
+    var btn = $(this);
+    $.ajax({
+      url: btn.attr("data-url"),
+      type: 'get',
+      dataType: 'json',
+      beforeSend: function () {
+        $("#ajax_modal").modal("show");
+      },
+      success: function (data) {
+        $("#ajax_modal .modal-content").html(data.html_form);
+      }
+    });
+  };
+
+  var saveForm = function () {
+    var form = $(this);
+    $.ajax({
+      url: form.attr("action"),
+      data: form.serialize(),
+      type: form.attr("method"),
+      dataType: 'json',
+      success: function (data) {
+        if (data.form_is_fine) {
+          alert("Wykonano");  
+          const about_me =  $(data.name_of_update)
+          $("#ajax_modal").modal("hide"); 
+          about_me.fadeTo('slow', 0).promise().then(() => {
+            about_me.html(data.html_form);  
+            about_me.fadeTo('slow', 1)
+          });
+        }
+        else {
+          $("#ajax_modal .modal-content").html(data.html_form);
+        }
+      }
+    });
+    return false;
+  };
+
+
+
+"{% for l, locationa, locationb in loc %}"
+console.log("halo")
+var a = "{{locationa}}"
+var b = "{{locationb}}"
+mapboxgl.accessToken = 'pk.eyJ1IjoiZmlsaXBzMTIzNDUiLCJhIjoiY2tla2JldXJoMDV2YzJzczE3bDFiZ3lxOCJ9.BXFJvquub_Vn9qhwrt4xrQ';
+console.log('map{{l.id}}')
+var map = new mapboxgl.Map({
+container: 'map{{l.id}}', // container id
+style: 'mapbox://styles/mapbox/streets-v11',
+center: [a, b], // starting position
+zoom: 12 // starting zoom
+});
+
+var marker = new mapboxgl.Marker()
+.setLngLat([a, b])
+.addTo(map);
+ 
+// Add zoom and rotation controls to the map.
+map.addControl(new mapboxgl.NavigationControl());
+"{% endfor %}"
+// Get the modal
+var modal = document.getElementById("myModal");
+
+// Get the image and insert it inside the modal - use its "alt" text as a caption
+
+
+for (i = 0; i < {{img_count}}; i++){
+    var img = document.getElementById("myImg-"+i);
+
+    var modalImg = document.getElementById("img01");
+    var captionText = document.getElementById("caption");
+    img.onclick = function(){
+        modal.style.display = "block";
+        modalImg.src = this.src;
+        captionText.innerHTML = this.alt;
+    }
+}
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() { 
+  modal.style.display = "none";
+}
+
+
+     $(".add_about_me_btn").click(loadForm);
+     $(".add_achievements_btn").click(loadForm);
+     $(".delete_achievement").click(loadForm);
+     $(".add_specialisation").click(loadForm);
+  $(".achievements_div").on("click", ".edit_achievements", loadForm);
+  $(".achievements_div").on("click", ".delete_achievement", loadForm);
+  $(".specialisation_div").on("click", ".edit_specialisation", loadForm);
+  $(".specialisation_div").on("click", ".delete_specialisation", loadForm);
+  $(".comments_div").on("click", ".edit_comment", loadForm);
+  $(".comments_div").on("click", ".edit_comment_modal", loadForm);
+  $(".comments_div").on("click", ".delete_comment", loadForm);
+  $(".comments_div").on("click", ".delete_comment_modal", loadForm);
+  $(".comments_div").on("click", ".comment_add", loadForm);
+  $(".comments_div").on("click", ".hide_comment", loadForm);
+  $(".comments_div").on("click", ".hide_comment_modal", loadForm);
+  $("#ajax_modal").on("submit", ".about_me_create_form", saveForm); 
+  $("#ajax_modal").on("submit", ".delete_form", saveForm); 
+
+});
+
+</script>
+
+
+{% endblock content %}

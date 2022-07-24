@@ -1,0 +1,294 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+<style type="text/css">
+
+.center {
+  background-color: white;
+  width: 300px;
+  height: 300px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+}
+.btn.btn-sm {
+    padding: .5rem .9rem;
+    font-size: .64rem;
+}
+h1{
+  text-align: center
+}
+b{
+  text-align: left;
+}
+</style>
+
+<center>
+  <div>
+    <h1>Lista dentystów</h1>
+    <i id="search-icon" class="fa fa-search"></i>
+  <input style="width: 45%" id="user-input" placeholder="Szukaj dentystów">
+      
+      <select id="search_choices">
+    <option value="name" selected>Imię</option>
+    <option value="surname">Nazwisko</option>
+    <option value="phone">Telefon</option>
+    <option value="city">Miasto</option>
+  </select>
+  {% if not  request.user.is_dentist %}
+  <label>
+
+  <input id="my-checkbox" type="checkbox" /> Moi
+</label>
+{% endif %}
+</div>
+</center>
+<center>
+<div style="max-width: 1700px;">
+
+<table class=" table  table-striped" id="dentist-table">
+  <thead>
+    <tr>
+      <th scope="col" >Imie</th>
+      <th scope="col">Nazwisko</th>
+      <th scope="col">Telefon</th>
+      <th scope="col">Miasto</th>
+      <th scope="col">Adres</th>
+      {% if not unregistered %}
+      {% if not auth_only %}
+      <th scope="col">Zapisany</th>
+      <th scope="col" style="width:10%"><center>Zapisz się do dentysty</center></th>
+      {% endif %}
+      <th scope="col"style="width:24%" ><center>Pozostałe opcje</center></th>
+      {% endif %}
+
+    </tr>
+  </thead>
+  <tbody>
+  {% include 'account/snippets/dentist_list.html'%}
+  </tbody>
+</table>
+</div>
+</center>
+
+  <div class="modal fade" id="modal-dentist">
+    <div class="modal-dialog">
+      <div class="modal-content">
+      </div>
+    </div>
+  </div>
+
+        <div class="modal fade " id="visit_add_tooth_to_visit_modal" style=" 
+   z-index: 3000; ">
+    <div class="modal-dialog modal-lg" style=" 
+   z-index: 3000; ">
+      <div class="modal-content"  style=" 
+   z-index: 3000; ">
+      </div>
+    </div>
+  </div>
+
+<script>
+
+
+$(function () {
+  var user_input = $("#user-input")
+        var checkbox = $('#my-checkbox');
+
+const dentist_table =  $("#dentist-table tbody")
+
+checkbox.click(function() {
+          var spec_url
+          if(checkbox.is(':checked')){
+            spec_url = '/choose_dentist/only/mine'}
+          else{
+            spec_url = '/choose_dentist/'
+          }
+             console.log('jest');
+               $.ajax({
+                url: spec_url,
+                type: 'get',
+                dataType: 'json',
+           success: function(data) {
+          document.getElementById('user-input').value = ''
+            // fade out the dentist_table, then:
+            dentist_table.fadeTo('slow', 0).promise().then(() => {
+                // replace the HTML contents
+                dentist_table.html(data['html_from_view'])
+                // fade-in the div with new contents
+                dentist_table.fadeTo('slow', 1)
+            })
+        }
+
+              });
+          });
+
+var special = function () {
+    var btn = $(this);
+    $.ajax({
+      url: btn.attr("data-url"),
+      type: 'get',
+      dataType: 'json',
+
+      success: function (data) {
+        dentist_table.html(data.html_dentist_list);  // <-- Replace the table body
+      }
+    });
+  };
+  $("#dentist-table").on("click", ".dentist_change_stat_view", special);
+
+
+  var loadForm = function () {
+    var btn = $(this);
+    $.ajax({
+      url: btn.attr("data-url"),
+      type: 'get',
+      dataType: 'json',
+      beforeSend: function () {
+        $("#modal-dentist").modal("show");
+      },
+      success: function (data) {
+        $("#modal-dentist .modal-content").html(data.html_form);
+      }
+    });
+  };
+
+  var saveForm = function () {
+    var form = $(this);
+    $.ajax({
+      url: form.attr("action"),
+      data: form.serialize(),
+      type: form.attr("method"),
+      dataType: 'json',
+      success: function (data) {
+        if (data.form_is_fine) {
+          alert("Wykonano");  
+          $("#modal-dentist").modal("hide");  // <-- Close the modal
+          if (data.adding_tooth_to_visit == "TAK"){
+            $("#visit_add_tooth_to_visit_modal .modal-content").html(data.html_form);            
+            $("#visit_add_tooth_to_visit_modal").modal("show");
+
+          }
+          else{ 
+
+
+                // replace the HTML contents
+              dentist_table.html(data.html_dentist_list);  // <-- Replace the table body
+
+        }
+        }
+        else {
+          $("#modal-dentist .modal-content").html(data.html_form);
+        }
+      }
+    });
+    return false;
+  };
+
+
+
+
+  // Update book
+  $("#dentist-table").on("click", ".new_visit_view", loadForm);
+  $("#dentist-table").on("click", ".join_as_receptionist", loadForm);
+  $("#dentist-table").on("click", ".leave_as_receptionist", loadForm);
+  $("#modal-dentist").on("submit", ".visit_new_create_form", saveForm); 
+  $("#modal-dentist").on("submit", ".ask_form", saveForm); 
+
+
+
+const search_icon = $('#search-icon')
+
+var endpoint = '/choose_dentist/'
+  checkbox.click(function() {
+if(checkbox.is(':checked')){
+endpoint =  '/choose_dentist/only/mine'
+
+}
+else{
+  endpoint =  '/choose_dentist'
+}});
+
+
+const delay_by_in_ms = 700
+let scheduled_function = false
+
+let ajax_call = function (endpoint, request_parameters) {
+    $.getJSON(endpoint, request_parameters)
+        .done(response => {
+
+            // fade out the dentist_table, then:
+            dentist_table.fadeTo('slow', 0).promise().then(() => {
+                // replace the HTML contents
+                dentist_table.html(response['html_from_view'])
+                // fade-in the div with new contents
+                dentist_table.fadeTo('slow', 1)
+                // stop animating search icon
+                search_icon.removeClass('blink')
+            })
+        })
+}
+
+
+user_input.on('keyup', function () {
+
+    const request_parameters = {
+        q: $('#search_choices').val() +"/--/"+ $(this).val() // value of user_input: the HTML element with ID user-input
+    }
+
+    // start animating the search icon with the CSS class
+    search_icon.addClass('blink')
+
+    // if scheduled_function is NOT false, cancel the execution of the function
+    if (scheduled_function) {
+        clearTimeout(scheduled_function)
+    }
+
+    // setTimeout returns the ID of the function to be executed
+    scheduled_function = setTimeout(ajax_call, delay_by_in_ms, endpoint, request_parameters)
+})
+
+
+});
+
+</script>
+
+
+{% endblock content %}
+
+<script type="text/javascript">
+  
+$.ajax({
+      url: "{% url 'choose_dentist'  %}"
+      data: form.serialize(),
+      type: form.attr("method"),
+      dataType: 'json',
+      success: function (data) {
+        if (data.form_is_fine) {
+          alert("Wykonano");  
+          $("#modal-dentist").modal("hide");  // <-- Close the modal
+          if (data.adding_tooth_to_visit == "TAK"){
+            $("#visit_add_tooth_to_visit_modal .modal-content").html(data.html_form);            
+            $("#visit_add_tooth_to_visit_modal").modal("show");
+
+          }
+          else{ 
+
+
+                // replace the HTML contents
+              dentist_table.html(data.html_dentist_list);  // <-- Replace the table body
+
+        }
+        }
+        else {
+          $("#modal-dentist .modal-content").html(data.html_form);
+        }
+      }
+    });
+    return false;
+  };
+
+</script>

@@ -1,0 +1,23 @@
+{% load static %}
+<div class="inline-block" style="display: inline-block;">
+{% for a, b in images %}
+
+  <div class="" style="max-width: 24%;max-height: 24%;display: inline-block;">
+<img style="  border-radius: 5px; cursor: pointer;transition: 0.3s;object-fit: cover;width:100px;height:100px;" id="myImg-{{b}}" src="/media/{{a.Image}}" class = "myImg" alt="{{a.about}}" style="width:100%;max-width:300px">
+        {% if a.account == request.user %}
+    <a type="button" href="{% url 'delete_image' a.id %}" class="btn btn-red btn-sm">Usuń</a>
+    {% endif %}
+</div>
+
+{% endfor %}
+
+</div>
+
+
+<!-- The Modal -->
+<div id="myModal" class="modal modas">
+  <span class="close">&times;</span>
+  <img class="modal-content" id="img01">
+  <div id="caption"></div>
+</div>
+

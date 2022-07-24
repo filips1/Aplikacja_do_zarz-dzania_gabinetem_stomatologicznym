@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style type="text/css">
+.testowe{
+      padding: 0px 0px 20px 0px;
+}
+</style>
+<div class="container">
+    <div class = "row">
+        {% for th, msg, author_name, type_of, oth_user in lista %}
+
+            <div class="left-column col-lg-4 ">
+                <div class = "testowe">
+                    <div class = "card m-auto d-flex flex-column p-3">
+                        <center>
+                            <img src="/media/{{ oth_user.profile_pic }}" class="rounded-circle z-depth-0" alt="avatar image" width=75 height=75 style=" margin-left: auto; margin-right: auto;">       
+                            <br/>
+                            <b>{{oth_user.username}}</b>             
+
+                            ({{type_of}})<br/>
+                            {{author_name}}<br/>
+                            Ostatnia wiadomość:<br/>
+                            {% if msg.user == request.user %}
+                            <b>{{msg.user.username}}</b> (moja)
+                            {% else %}
+                            <b>{{msg.user.username}}</b>
+                            {% endif %}
+                            na temat:<br/>
+                            <i>{{msg.message}}</i><br/>
+                            <a class = "btn btn-primary" href = "{% url 'chat' oth_user.username %} ">Rozmowa</a>
+
+                        </center>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock content %}

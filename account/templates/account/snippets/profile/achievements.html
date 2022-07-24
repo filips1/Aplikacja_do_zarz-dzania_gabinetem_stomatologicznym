@@ -1,0 +1,20 @@
+            <h4>Osiągnięte sukcesy</h4>
+            
+            {% for a in achievements %}
+            <p>
+            {% if a.significance == '1' %}
+            <i class="fa fa-trophy" style="color: gold;"></i>
+            {% elif a.significance == '2' %}
+            <i class="fa fa-trophy"style="color: silver;"></i>
+            {% else %}
+
+            <i class="fa fa-trophy"style="color: brown;"></i>
+            {% endif %}
+            {{a.award}}<br/>
+            {% if a.dentist.account == request.user %}
+            <a style="color: blue" class="edit_achievements" data-url="{% url 'edit_achievements' a.id %}">Edytuj</a>
+            <a style="color: orange" class="delete_achievement" data-url="{% url 'delete_achievement' a.id %}">Usuń</a>
+            {% endif %}
+            </p>
+            {% endfor %}
+      

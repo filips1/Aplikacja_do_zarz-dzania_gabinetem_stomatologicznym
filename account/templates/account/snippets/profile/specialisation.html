@@ -1,0 +1,13 @@
+            <h4>Specjalizacje</h4>
+            <p>Specjalizuję się w: </p>
+            <ul>
+            {% for s in specialisation %}
+            
+            <li>{{s.Specialisation}}</li>
+            {% if s.dentist.account == request.user %}
+            <a style="color: blue" class="edit_specialisation" data-url="{% url 'edit_specialisation' s.id %}">Edytuj</a>
+            <a style="color: orange" class="delete_specialisation" data-url="{% url 'delete_specialisation' s.id %}">Usuń</a>
+            {% endif %}
+            {% endfor %}
+
+            </ul>  

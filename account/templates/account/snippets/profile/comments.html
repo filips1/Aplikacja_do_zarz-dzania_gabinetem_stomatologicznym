@@ -1,0 +1,79 @@
+
+<div class="card-header border-0 font-weight-bold">{{comm_count}} Komentarzy</div>
+{% for comment in comments %}
+  <div class="media d-block d-md-flex mt-4">
+    <img class="card-img-64 d-flex mx-auto mb-3" src="/media/{{ comment.account.profile_pic }}">
+    <div class="media-body text-center text-md-left ml-md-3 ml-0">
+      <h5 class="font-weight-bold mt-0">
+        <a href="">{{comment.account.username}}</a>
+      </h5>
+     {{comment.body}}
+          <br/>
+
+            <i style="text-color: grey; font-size:12px">Utworzono {{comment.created_on}}<br/></i>
+
+     {% if comment.account == request.user %}
+        <a style="color: blue" class="edit_comment" data-url="{% url 'edit_comment' comment.id %}">Edytuj</a>  
+                <a style="color: blue" class="delete_comment" data-dismiss="modal" data-url="{% url 'delete_comment' comment.id %}">Usuń</a>
+
+      {% elif comment.dentist.account == request.user %}
+      <a style="color: blue" class="hide_comment" data-dismiss="modal" data-url="{% url 'hide_comment' comment.id %}">Ukryj</a>
+      {% endif %}
+  </div>
+</div>
+  {% endfor %}
+<center>
+  {% if more_com %}
+
+ <a class = "btn btn-primary" data-toggle="modal" data-target="#CommentModal">
+  Zobacz więcej</a>
+   {% endif %}
+       {% if user.is_authenticated %}
+    <a class = "btn btn-primary comment_add" data-url = "{% url 'add_comment' dentist.id %}">Napisz komentarz</a>
+    {% endif %}
+</center>
+
+
+
+
+
+<div class="modal fade" id="CommentModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Komentarze</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+          <div class="card-header border-0 font-weight-bold" style=" margin-left: auto; margin-right: auto;">{{comm_count}} Komentarzy</div>
+{% for comment in more_comments %}
+  <div class="media d-block d-md-flex mt-4">
+    <img class="card-img-64 d-flex mx-auto mb-3" src="/media/{{ comment.account.profile_pic }}">
+    <div class="media-body text-center text-md-left ml-md-3 ml-0">
+      <h5 class="font-weight-bold mt-0">
+
+        {{comment.account.username}}
+      </h5>
+     {{comment.body}}
+     <br/>
+      <i style="text-color: grey; font-size:12px">Utworzono {{comment.created_on}}<br/></i>
+     {% if comment.account == request.user %}
+        <a style="color: blue" class="edit_comment_modal" data-dismiss="modal" data-url="{% url 'edit_comment' comment.id %}">Edytuj</a> 
+        <a style="color: blue" class="delete_comment_modal" data-dismiss="modal" data-url="{% url 'delete_comment' comment.id %}">Usuń</a>
+
+      {% elif comment.dentist.account == request.user %}
+      <a style="color: blue" class="hide_comment_modals" data-dismiss="modal" data-url="{% url 'hide_comment' comment.id %}">Ukryj</a>
+      {% endif %}
+  </div>
+</div>
+{% endfor %}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" style=" margin-left: auto; margin-right: auto;" data-dismiss="modal">Zamknij</button>
+      </div>
+    </div>
+  </div>
+</div>

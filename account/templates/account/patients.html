@@ -1,0 +1,414 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+<style type="text/css">
+
+.center {
+  background-color: white;
+  width: 300px;
+  height: 300px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+}
+
+@keyframes blinker {
+    from {opacity: 1.0;}
+    to {opacity: 0.0;}
+  }
+  
+.blink {
+    text-decoration: blink;
+    animation-name: blinker;
+    animation-duration: 0.6s;
+    animation-iteration-count:infinite;
+    animation-timing-function:ease-in-out;
+    animation-direction: alternate;
+  }
+
+h1{
+  text-align: center
+}
+b{
+  text-align: left;
+}
+
+.btn.btn-sm {
+    padding: .5rem .4rem;
+    font-size: .64rem;
+}
+table.table a {
+    margin: 0.2rem;
+    color: #212529;
+}
+
+</style>
+{% if request.user.is_authenticated %}
+  {% if request.user.is_receptionist %}
+  <center><h1>Przegląd i dodawanie pacjentów dentysty {{dent_name_surname}}</h1></center>    {% endif %}
+  <p>
+
+    {% if request.user.is_dentist %}
+    <button type="button" id="dentist_create_patient" class="btn btn-primary create_patient"
+                  data-url="{% url 'create_new_patient' %}">
+      Nowy Pacjent
+    </button>
+    {% elif request.user.is_receptionist %}
+        <button type="button" class="btn btn-primary create_patient"
+                  data-url="{% url 'create_new_patient_oth' curr_dentist_id  %}">
+      Nowy Pacjent
+    </button>
+    {% endif %}
+  </p>
+  <center>
+    <i id="search-icon" class="fa fa-search"></i>
+    <input style="width: 45%" id="user-input" placeholder="Szukaj pacjentów"><select id="search_choices">
+    <option value="name" selected>Imię</option>
+    <option value="surname">Nazwisko</option>
+    <option value="phone">Telefon</option>
+    <option value="city">Miasto</option>
+  </select>
+
+
+    <label>
+    <input id="my-checkbox" type="checkbox" /> Moi
+  </label></center>
+<center>
+<div style="max-width: 1700px;">
+<table class="table table-striped" id="patient-table">
+  <thead>
+    <tr>
+      <th scope="col">Imie</th>
+      <th scope="col">Nazwisko</th>
+      <th scope="col">Posiada Konto?</th>
+      <th scope="col">Wyleczone Zęby</th>
+      <th scope="col">Chore Zęby</th>
+      <th scope="col">Ostatnia wizyta kontrolna</th>
+      <th scope="col">opcje</th>
+
+
+    </tr>
+  </thead>
+  <tbody>
+        {% include 'account/patients_list.html' %}
+ 
+  </tbody>
+</table>
+</div>
+</center>
+{% endif %}
+  <div class="modal fade" id="modal-patient">
+    <div class="modal-dialog">
+      <div class="modal-content">
+      </div>
+    </div>
+  </div>
+
+
+    <div class="modal fade " id="visit_td_edit_modal" style=" 
+   z-index: 3000; ">
+    <div class="modal-dialog" style=" 
+   z-index: 3000; ">
+      <div class="modal-content"  style=" 
+   z-index: 3000; ">
+      </div>
+    </div>
+  </div>
+
+    <div class="modal fade " id="visit_all_td_modal" style=" 
+   z-index: 3000; ">
+    <div class="modal-dialog modal-lg" style=" 
+   z-index: 3000; ">
+      <div class="modal-content"  style=" 
+   z-index: 3000; ">
+      </div>
+    </div>
+  </div>
+
+
+    <div class="modal fade " id="visit_add_tooth_to_visit_modal" style=" 
+   z-index: 3000; ">
+    <div class="modal-dialog modal-lg" style=" 
+   z-index: 3000; ">
+      <div class="modal-content"  style=" 
+   z-index: 3000; ">
+      </div>
+    </div>
+  </div>
+
+
+
+  <div class="modal fade " id="visit_tooth_modal">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable" style="overflow-y: initial; width:1250px;">
+      <div class="modal-content" style="max-height: 80vh;
+    overflow-y: auto">
+      </div>
+    </div>
+  </div>
+
+    <script>
+
+
+$(function () {
+  var user_input = $("#user-input")
+  const patients_table =  $("#patient-table tbody")
+
+        var checkbox = $('#my-checkbox');
+        
+        checkbox.click(function() {
+          var spec_url
+          "{% if request.user.is_dentist %}"
+          if(checkbox.is(':checked')){
+            spec_url = '/patients/only/mine/'}
+          else{
+            spec_url = '/patients/'
+          }
+          "{% else %}"
+            if(checkbox.is(':checked')){
+              spec_url = '/patients/only/receptionist/'+"{{curr_dentist_id}}" + "/mine"}
+              else{
+            spec_url = '/patients/only/receptionist/'+"{{curr_dentist_id}}"
+          }
+          "{% endif %}"
+             console.log('jest');
+               $.ajax({
+                url: spec_url,
+                type: 'get',
+                dataType: 'json',
+           success: function(data) {
+          document.getElementById('user-input').value = ''
+            patients_table.fadeTo('slow', 0).promise().then(() => {
+                patients_table.html(data['html_from_view'])
+                patients_table.fadeTo('slow', 1)
+            })
+        }
+
+              });
+          });
+
+
+
+
+  var loadForm = function () {
+    var btn = $(this);
+    $.ajax({
+      url: btn.attr("data-url"),
+      type: 'get',
+      dataType: 'json',
+
+
+      success: function (data) {
+        if (data.break){
+        $("#modal-patient").modal("hide");          
+        }
+        else{
+        $("#modal-patient").modal("show");
+        $("#modal-patient .modal-content").html(data.html_form);
+      }
+      
+        
+      }
+    });
+  };
+
+  var saveForm = function () {
+    var form = $(this);
+    $.ajax({
+      url: form.attr("action"),
+      data: form.serialize(),
+      type: form.attr("method"),
+      dataType: 'json',
+      success: function (data) {
+        if (data.form_is_fine) {
+          alert("Wykonano");  
+          $("#modal-patient").modal("hide"); 
+          if (data.refresh){
+            console.log("Wykonano")
+          }
+          else if (data.visit_creation){
+            $(data.modal+" .modal-content").html(data.html_form);
+            $(data.modal).modal("show");
+          }
+          else{ 
+            checkbox.prop('checked', true);
+
+                      patients_table.fadeTo('slow', 0).promise().then(() => {
+
+              patients_table.html(data.html_patient_list);  
+
+                patients_table.fadeTo('slow', 1)
+
+            })
+        }
+      }
+        else {
+          $("#modal-patient .modal-content").html(data.html_form);
+        }
+      }
+    });
+    return false;
+  };
+
+
+
+   $(".create_patient").click(loadForm);
+  $("#modal-patient").on("submit", ".patient_create_form", saveForm);
+
+  $("#patient-table").on("click", ".patient_update", loadForm);
+  $("#modal-patient").on("submit", ".patient_update_form", saveForm);
+
+  $("#patient-table").on("click", ".delete_patient", loadForm);
+  $("#modal-patient").on("submit", ".patient_delete_form", saveForm); 
+
+  $("#patient-table").on("click", ".new_visit_view", loadForm);
+  $("#modal-patient").on("submit", ".visit_new_create_form", saveForm); 
+
+const search_icon = $('#search-icon')
+"{% if request.user.is_dentist %}"
+var endpoint = '/patients/'
+  checkbox.click(function() {
+if(checkbox.is(':checked')){
+endpoint =  '/patients/only/mine'
+  console.log(endpoint);
+}
+else{
+  endpoint =  '/patients'
+}});
+"{% else %}"
+var endpoint = '/patients/only/receptionist/'+"{{curr_dentist_id}}"
+  checkbox.click(function() {
+if(checkbox.is(':checked')){
+endpoint =  '/patients/only/receptionist/'+"{{curr_dentist_id}}"+ "/mine"
+  console.log(endpoint);
+}
+else{
+  endpoint =  '/patients/only/receptionist/'+"{{curr_dentist_id}}"
+}});
+"{% endif %}"
+
+
+const delay_by_in_ms = 700
+let scheduled_function = false
+
+let ajax_call = function (endpoint, request_parameters) {
+    $.getJSON(endpoint, request_parameters)
+        .done(response => {
+
+            patients_table.fadeTo('slow', 0).promise().then(() => {
+                patients_table.html(response['html_from_view'])
+                patients_table.fadeTo('slow', 1)
+                search_icon.removeClass('blink')
+            })
+        })
+}
+
+
+user_input.on('keyup', function () {
+
+    const request_parameters = {
+        q: $('#search_choices').val() +"/--/"+ $(this).val() 
+    }
+
+
+    search_icon.addClass('blink')
+
+    if (scheduled_function) {
+        clearTimeout(scheduled_function)
+    }
+
+    scheduled_function = setTimeout(ajax_call, delay_by_in_ms, endpoint, request_parameters)
+})
+
+  var secsaveForm = function () {
+    var form = $(this);
+    $.ajax({
+
+      url: form[0][3].formAction,
+      data: form.serialize(),
+      type: form.attr("method"),
+      dataType: 'json',
+      success: function (data) {
+        if (data.form_is_fine) {
+
+
+          alert("Wykonano");  
+          const tooth_table =  $("#td_"+data.tooth+" tbody")
+
+                      tooth_table.fadeTo('slow', 0).promise().then(() => {
+                tooth_table.html(data['html_form'])
+                tooth_table.fadeTo('slow', 1)
+      });
+        
+                    }
+                    else{
+                      alert("Błędne dane");
+        }
+
+
+
+
+
+      }
+    });
+    return false;
+  };
+
+  var thsaveForm = function () {
+    var form = $(this);
+    $.ajax({
+
+      url: form.attr("action"),
+      data: form.serialize(),
+      type: form.attr("method"),
+      dataType: 'json',
+      success: function (data) {
+        if (data.form_is_fine) {
+
+             $('.modal-backdrop').css('z-index', '1040')
+            $("#visit_td_edit_modal").modal("hide");
+          $("#visit_tooth_modal").modal("show");        
+
+          alert("Wykonano"); 
+          const tooth_table =  $("#td_"+data.tooth+" tbody")
+
+                      tooth_table.fadeTo('slow', 0).promise().then(() => {
+
+                tooth_table.html(data['html_form'])
+                tooth_table.fadeTo('slow', 1)
+
+      });
+
+               $("#img_"+data.tooth).fadeTo('slow', 0).promise().then(() => {
+                $("#img_"+data.tooth).attr('src',"/static/"+data.toothimg);
+                $("#img_"+data.tooth).fadeTo('slow', 1)
+
+      });
+
+                    }
+
+
+
+
+
+      }
+    });
+    return false;
+  };
+
+  $("#visit_tooth_modal").on("submit", ".visit_new_create_form", secsaveForm); 
+
+  $("#visit_tooth_modal").on("submit", ".visit_tooth_form", secsaveForm); 
+  $("#visit_td_edit_modal").on("submit", ".visit_edit_td_form", thsaveForm); 
+
+});
+
+
+
+    </script>
+
+
+{% endblock content %}
+

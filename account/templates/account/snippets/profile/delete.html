@@ -1,0 +1,31 @@
+{% if form_type == 'achievement' %}
+<form method="post" action="{% url 'delete_achievement' achievement.id %}" class="delete_form">
+{% elif form_type == 'specialisation' %}
+<form method="post" action="{% url 'delete_specialisation' specialisation.id %}" class="delete_form">
+{% elif form_type == 'comment' %}
+<form method="post" action="{% url 'delete_comment' comment.id %}" class="delete_form">
+{% elif form_type == 'comment_hide' %}
+<form method="post" action="{% url 'hide_comment' comment.id %}" class="delete_form">
+    {% endif %}
+  {% csrf_token %}
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    </button>
+    <h4 class="modal-title">Na pewno?</h4>
+  </div>
+  <div class="modal-body">
+    {% if form_type == 'achievement' %}
+    <p class="lead">Czy na pewno chcesz usunąć osiągnięcie <strong>{{ achievement.award }}</strong>?</p>
+    {% elif form_type == 'specialisation' %}
+    <p class="lead">Czy na pewno chcesz usunąć specjalizację <strong>{{ specialisation.Specialisation }}</strong>?</p>
+    {% elif form_type == 'comment' %}
+    <p class="lead">Czy na pewno chcesz usunąć komentarz <strong>{{ comment.body }}</strong>?</p>
+    {% elif form_type == 'comment_hide' %}
+    <p class="lead">Czy na pewno chcesz ukryć komentarz <strong>{{ comment.body }}</strong> użytkownika <strong>{{ comment.account.username }}</strong>?</p>
+    {% endif %}
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+    <button type="submit" class="btn btn-danger">Usuń</button>
+  </div>
+</form>

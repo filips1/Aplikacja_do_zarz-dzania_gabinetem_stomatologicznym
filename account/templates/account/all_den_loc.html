@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+{% include 'account/snippets/css.html' %}
+
+
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+<script src="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css" rel="stylesheet" />
+<style>
+    body { margin: 0; padding: 0; }
+    #map { position: absolute; top: 150px; bottom: -150px; width: 100%; }
+    h1{
+  text-align: center
+}
+</style>
+<h1> MAPA DENTYSTÓW </h1>
+<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.5.1/mapbox-gl-geocoder.min.js"></script>
+<link
+rel="stylesheet"
+href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.5.1/mapbox-gl-geocoder.css"
+type="text/css"
+/>
+<!-- Promise polyfill script required to use Mapbox GL Geocoder in IE 11 -->
+<script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.min.js"></script>
+<script src="https://unpkg.com/es6-promise@4.2.4/dist/es6-promise.auto.min.js"></script>
+<script src="https://unpkg.com/@mapbox/mapbox-sdk/umd/mapbox-sdk.min.js"></script>
+<div id="map"></div>
+ 
+<script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoiZmlsaXBzMTIzNDUiLCJhIjoiY2tla2JldXJoMDV2YzJzczE3bDFiZ3lxOCJ9.BXFJvquub_Vn9qhwrt4xrQ';
+var mapboxClient = mapboxSdk({ accessToken: mapboxgl.accessToken });
+mapboxClient.geocoding
+.forwardGeocode({
+query: "{{city}},{{adress}}",
+autocomplete: false,
+limit: 1
+})
+.send()
+.then(function(response) {
+if (
+response &&
+response.body &&
+response.body.features &&
+response.body.features.length
+) {
+var feature = response.body.features[0];
+ 
+var map = new mapboxgl.Map({
+container: 'map',
+style: 'mapbox://styles/mapbox/streets-v11',
+center: feature.center,
+zoom: 13
+});
+var popupa = new mapboxgl.Popup({ offset: 25 }).setHTML(
+    'JA');
+new mapboxgl.Marker()
+.setLngLat(feature.center)
+.setPopup(popupa)
+.addTo(map);
+
+
+map.addControl(
+new MapboxGeocoder({
+accessToken: mapboxgl.accessToken,
+mapboxgl: mapboxgl
+})
+);
+map.addControl(new mapboxgl.NavigationControl());
+"{% for a,b,c,d in locab%}"
+
+var popup = new mapboxgl.Popup({ offset: 25 }).setHTML(
+'Nazwa: <b>{{c.name}}</b>'+
+'<br>Opis lokacji: {{c.about}} <br>'+
+'Dentyści: </br>'+
+'{% for den in c.dentist.all %}'+
+'Imie i nazwisko:  <b> {{den.First_Name}} {{den.Surname}}</b>'+
+'<br>Telefon: <b> {{den.phone_number}}</b>'+
+'<br>Email: <b> {{den.account.email}}</b>'+
+"<a class = 'btn btn-primary' href = '{% url 'dentist_profile' den.id %}'>Przejdź na profil</a>"+
+'{% endfor %}'+
+'Recepcjoniści:'+
+'{% for rec in c.receptionist.all %}'+
+'<br>Imie i nazwisko:  <b> {{rec.First_Name}} {{rec.Surname}}</b>'+
+'<br>Telefon: <b> {{rec.phone_number}}</b>'+
+'<br>Email: <b> {{rec.account.email}}</b>'+
+'{% if not d and may_join %}'+
+"<a class = 'btn btn-primary' href = '{% url 'location_ask_for_invite' c.id %}'>Poproś o dołączenie</a>"+
+'{% endif %}'+
+"<a class = 'btn btn-warning' href = '{% url 'clinic_location_info' c.id %}'>Szczegóły kliniki</a>"+
+'{% endfor %}'
+
+);
+ 
+
+
+var a = "{{a}}"
+var b = "{{b}}"
+var marker = new mapboxgl.Marker()
+.setLngLat([a, b])
+.setPopup(popup)
+.addTo(map);
+
+
+"{% endfor %}"
+}
+});
+ 
+
+</script>
+ 
+
+ 
+
+
+</script>
+
+
+{% endblock content %}
+ 
+ <script>
+
+mapboxgl.accessToken = 'pk.eyJ1IjoiZmlsaXBzMTIzNDUiLCJhIjoiY2tla2JldXJoMDV2YzJzczE3bDFiZ3lxOCJ9.BXFJvquub_Vn9qhwrt4xrQ';
+var map = new mapboxgl.Map({
+container: 'map', // container id
+style: 'mapbox://styles/mapbox/streets-v11',
+ // starting position
+zoom: 12 // starting zoom
+});
+map.addControl(
+new MapboxGeocoder({
+accessToken: mapboxgl.accessToken,
+mapboxgl: mapboxgl
+})
+);
+
+
+</script>
+
+

@@ -1,0 +1,86 @@
+
+<style type='text/css'>
+.form {
+  margin: auto;
+}
+
+.form input, .form select, .form textarea {
+  border-radius: 5px;
+  border: 1px solid #17a2b8;
+  outline: none;
+  background: none;
+  padding: 5px;
+  width: 100%;
+}
+</style>
+{% if form_type == "about_me"%}
+    <div class="card">
+      <h3 class="card-header light-blue lighten-1 white-text text-uppercase font-weight-bold text-center py-5">Dodaj informacje o mnie</h3>
+      <div class="card-body">
+
+<form method="post" class="about_me_create_form" action="{% url 'add_about_me' %}">
+{% elif form_type == "achievements"%}
+    <div class="card">
+      <h3 class="card-header light-blue lighten-1 white-text text-uppercase font-weight-bold text-center py-5">Dodaj zdjęcia</h3>
+      <div class="card-body">
+
+<form method="post" enctype="multipart/form-data" class="about_me_create_form" action="{% url 'add_achievements' %}" >
+{% elif form_type == "achievement_edit"%}
+    <div class="card">
+      <h3 class="card-header light-blue lighten-1 white-text text-uppercase font-weight-bold text-center py-5">Edytuj osiągnięcie</h3>
+      <div class="card-body">
+
+<form method="post" enctype="multipart/form-data" class="about_me_create_form" action="{% url 'edit_achievements' id %}" >
+
+{% elif form_type == "specialisation"%}
+    <div class="card">
+      <h3 class="card-header light-blue lighten-1 white-text text-uppercase font-weight-bold text-center py-5">Dodaj specjalizację</h3>
+      <div class="card-body">
+
+<form method="post" enctype="multipart/form-data" class="about_me_create_form" action="{% url 'add_specialisation' %}" >
+{% elif form_type == "specialisation_edit"%}
+    <div class="card">
+      <h3 class="card-header light-blue lighten-1 white-text text-uppercase font-weight-bold text-center py-5">Edytuj specjalizację</h3>
+      <div class="card-body">
+
+<form method="post" enctype="multipart/form-data" class="about_me_create_form" action="{% url 'edit_specialisation' id %}" >
+{% elif form_type == "comment"%}
+    <div class="card">
+      <h3 class="card-header light-blue lighten-1 white-text text-uppercase font-weight-bold text-center py-5">Dodaj komentarz</h3>
+      <div class="card-body">
+
+<form method="post" enctype="multipart/form-data" class="about_me_create_form" action="{% url 'add_comment' id %}" >
+{% elif form_type == "edit_comment"%}
+    <div class="card">
+      <h3 class="card-header light-blue lighten-1 white-text text-uppercase font-weight-bold text-center py-5">Edytuj komentarz</h3>
+      <div class="card-body">
+
+<form method="post" enctype="multipart/form-data" class="about_me_create_form" action="{% url 'edit_comment' id %}" >
+
+{% endif %}
+  {% csrf_token %}
+  <table class="form form-table">
+
+{{form}}
+
+      {% for field in form %}
+        {% for error in  field.errors %}
+            <small style="color: red;">{{error}}</small>
+        {% endfor %}
+    {% endfor %}
+
+    {% if form.non_field_errors %}
+        <div style = "color:red;">
+            <p>{{form.non_field_errors}}</p>
+        </div>
+    {% endif %}
+ 
+  </table>
+  <center>
+
+
+           <button type="submit" class="btn btn-info create_new_visit"> Zatwierdź </button></center>
+</form>
+      </div>
+
+    </div>

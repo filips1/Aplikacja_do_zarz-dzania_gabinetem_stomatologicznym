@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style type="text/css">
+.testowe{
+      padding: 0px 0px 20px 0px;
+}
+</style>
+<center>
+    <div class="container">
+                    <div class="left-column col-xl-10 ">
+                <div class = "testowe">
+    <div class = "card m-auto d-flex flex-column p-3">
+    <h1>Szczegóły kliniki {{location.name}}</h1>
+    </div>
+</div>
+</div>
+</div>
+
+
+</center>
+<div class="container">
+    <div class = "row">
+        
+
+            <div class="left-column col-xl-3 ">
+                <div class = "testowe">
+                    <div class = "card m-auto d-flex flex-column p-3">
+                        <center> 
+                        <h4>Dentyści pracujący w tym gabinecie</h4>
+
+                                {% for dentist, cennik, weekday, days in dentists %}
+                                <div data-dentist="{{dentist.account.username}}">
+                                {{dentist}}                            <br/>
+                                        <span class="more" style="display: none;">
+                                        email: {{dentist.account.email}}</br>
+                                        numer: {{dentist.phone_number}}</br>
+                                        Godzina Otwarcia: {{weekday.start_hour}}</br>
+                                        Godzina zamknięcia: {{weekday.end_hour}}</br>
+                                        Dni otwarcia: {{days}}</br>
+                                        Cennik (od zęba):</br>
+                                        plomba: {{cennik.plomba}} zł</br>
+                                        kanałowe: {{cennik.kanałowe}} zł</br>
+                                        czyszczenie: {{cennik.czyszczenie}} zł</br>
+                                        wyrywanie: {{cennik.wyrywanie}} zł</br>
+                                        operacja: {{cennik.operacja}} zł</br>
+
+
+                                        </span>
+
+                                <button onclick="readMore('{{dentist.account.username}}')" class="myBtn">Szczegóły</button>
+                                    </div>
+                                {% endfor %}
+
+
+                        </center>
+                    </div>
+                </div>
+                {% if main %}
+                <div class = "testowe">
+                    <div class = "card m-auto d-flex flex-column p-3">
+                        <center>
+                        <h4>Dentyści oczekujący na przyjęcie do gabinetu</h4>  
+                            {% for dentist in invitations_dentist %}
+                            {{dentist}}   
+                            <a class = "btn btn-primary" href = "{% url 'location_approve' dentist.id %}">Zatwierdź</a>
+                            <a class = "btn btn-primary" href = "{% url 'location_reject' dentist.id %}">Odrzuć</a>
+                            {% endfor %}
+                            <br/>
+           
+
+                        </center>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+                        <div class="left-column col-xl-6 ">
+                <div class = "testowe">
+                    <div class = "card m-auto d-flex flex-column p-3">
+                        <center>
+          <h4>Położenie gabinetu</h4>
+      </center>
+          <div id='map' style='width: 510px; height: 427px;'></div>
+          <h4>Opis gabinetu</h4>
+          {{location.about}}
+          {% if main %}
+          <a class = "btn btn-primary" href = "{% url 'location_add' location.id %}">Edytuj</a>
+          <a class = "btn btn-warning" href = "{% url 'location_resign' location.id %}">Zrezygnuj</a>
+          {% else %}
+            <a class = "btn btn-primary" href = "{% url 'location_ask_for_invite' location.id %}">Poproś o dołączenie</a>
+            {% endif %}
+
+                    </div>
+                </div>
+            </div>
+
+                                    <div class="left-column col-xl-3 ">
+                <div class = "testowe">
+                    <div class = "card m-auto d-flex flex-column p-3">
+<center> 
+
+                        <h4>Recepcjoniści pracujący w tym gabinecie</h4>
+
+
+                                {% for receptionist in location.receptionist.all %}
+                                <div data-dentist="{{receptionist.account.username}}">
+                                
+                                {{receptionist}}                            <br/>
+                                <span class="more" style="display: none;">
+                                Numer Telefonu: {{receptionist.phone_number}}<br/>
+                                Adres Email: {{receptionist.account.email}}<br/>
+
+                                </span>
+                                <button onclick="readMore('{{receptionist.account.username}}')" class="myBtn">Szczegóły</button>
+                                </div>
+                                {% endfor %}
+
+                            
+
+                        </center>
+                    </div>
+                </div>
+
+            
+                {% if main %}
+                <div class = "testowe">
+                    <div class = "card m-auto d-flex flex-column p-3">
+                        <center>
+                        <h4>Recepcjoniści oczekujący na przyjęcie do gabinetu</h4>  
+                                {% for receptionist in invitations_receptionist %}
+                                {{receptionist}}                            <br/>
+                                <a class = "btn btn-primary" href = "{% url 'location_approve' dentist.id %}">Zatwierdź</a>
+                                <a class = "btn btn-primary" href = "{% url 'location_reject' dentist.id %}">Odrzuć</a>
+                                {% endfor %} 
+                            <br/>
+       
+
+                        </center>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+    </div>
+</div>
+<script type="text/javascript">
+    
+
+var a = "{{loca}}"
+var b = "{{locb}}"
+mapboxgl.accessToken = 'pk.eyJ1IjoiZmlsaXBzMTIzNDUiLCJhIjoiY2tla2JldXJoMDV2YzJzczE3bDFiZ3lxOCJ9.BXFJvquub_Vn9qhwrt4xrQ';
+var map = new mapboxgl.Map({
+container: 'map', // container id
+style: 'mapbox://styles/mapbox/streets-v11',
+center: [a, b], // starting position
+zoom: 12 // starting zoom
+});
+
+var marker = new mapboxgl.Marker()
+.setLngLat([a, b])
+.addTo(map);
+ 
+// Add zoom and rotation controls to the map.
+map.addControl(new mapboxgl.NavigationControl());
+
+
+function readMore(dentist) {
+
+    let moreText = document.querySelector(`[data-dentist="${dentist}"] .more`); 
+    console.log(moreText)
+    console.log(dentist)
+    let btnText = document.querySelector(`[data-dentist="${dentist}"] .myBtn`);
+
+    if (moreText.style.display === "none") {
+        btnText.textContent = "Ukryj";
+        moreText.style.display = "inline";
+    } else {
+        btnText.textContent = "Szczegóły"; 
+        moreText.style.display = "none";
+    }
+}
+</script>
+{% endblock content %}

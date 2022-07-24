@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style type="text/css">
+.form-signin {
+  width: 100%;
+  max-width: 500px;
+  padding: 15px;
+  margin: auto;
+}
+.form-signin .form-control {
+  position: relative;
+  box-sizing: border-box;
+  height: auto;
+  padding: 10px;
+  font-size: 16px;
+}
+
+
+</style>
+
+
+<form class="form-signin text-center border border-light p-20" method="post" enctype="multipart/form-data">{% csrf_token %}
+    <p class="h4 mb-4">Zarejestruj się</p>
+        <input type="email" name="email" id="inputEmail" class="form-control mb-4" placeholder="Email address" required autofocus>
+    <input type="username" name="username" id="inputUsername" class="form-control mb-4" placeholder="Username" required >
+        <div class="form-row mb-4">
+        <div class="col">
+                <input type="password" id="inputPassword1" name = "password1" class="form-control" placeholder="Hasło" required>
+        </div>
+        <div class="col">
+                <input type="password" id="inputPassword2" name = "password2" class="form-control" placeholder="Potwierdź hasło" required>
+        </div>
+    </div>
+        <label for="inputprofile_pic">Wybierz profilowe</label>
+    <input type="file" id = "inputprofile_pic" name = "profile_pic">
+<br/>
+    <input type="checkbox" id="inputis_dentist" name = "is_dentist">
+
+    <label for="is_dentist">Dentysta?</label>
+        <input type="checkbox" id="inputis_receptionist" name = "is_receptionist">
+    <label for="is_receptionist">Recepcjonista?</label><br/>
+      {% for field in registration_form %}
+        {% for error in  field.errors %}
+            <small style="color: red;">{{error}}</small>
+        {% endfor %}
+    {% endfor %}
+
+    {% if registration_form.non_field_errors %}
+        <div style = "color:red;">
+            <p>{{registration_form.non_field_errors}}</p>
+        </div>
+    {% endif %}
+    <!-- Zarejestruj sie -->
+    <button class="btn  morpheus-den-gradient my-4 btn-block" id="submit" type="submit">Zarejestruj się</button>
+
+
+
+</form>
+
+
+{% endblock content %}

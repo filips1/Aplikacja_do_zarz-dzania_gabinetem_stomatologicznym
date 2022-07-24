@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+<style type="text/css">
+.form-signin {
+  width: 100%;
+  max-width: 450px;
+  padding: 15px;
+  margin: auto;
+}
+
+</style>
+ 
+<form class="form-signin text-center border border-light p-5" method="post">{% csrf_token %}
+    {% if request.user.is_dentist%}
+        <h1 class="h3 mb-3 font-weight-normal">Dodatkowe Dane</h1>
+        <div class="form-row mb-2">
+        <div class="col">
+            <!-- Imie --> 
+                <input type="text" name="First_Name" id="inputFirst_Name" class="form-control " placeholder="Imie"  value="{{form.initial.First_Name}}" required >
+
+        </div>
+        <div class="col">
+            <!-- Nazwisko -->
+                 <input type="text" id="inputSurname" name = "Surname" class="form-control " placeholder="Nazwisko" value="{{form.initial.Surname}}" required>
+        </div>
+    </div>
+        <input type="text" id="inputphone_number" name = "phone_number" class="form-control mb-2" placeholder="Numer Telefonu" value="{{form.initial.phone_number}}"   required>
+        <input type="text" id="inputcity" name = "city" class="form-control mb-2" placeholder="Miasto" value="{{form.initial.city}}"  required>
+        <input type="text" id="inputadress" name = "clinic_adress" class="form-control mb-2" placeholder="Adres kliniki" value="{{form.initial.clinic_adress}}"  required>  
+    {% else %}
+        <h1 class="h3 mb-3 font-weight-normal">Dodatkowe Dane</h1>
+        <div class="form-row mb-4">
+        <div class="col">
+            <!-- Imie -->
+                <input type="text" name="First_Name" id="inputFirst_Name" class="form-control " placeholder="Imie" value="{{form.initial.First_Name}}" required >
+        </div>
+        <div class="col">
+            <!-- Nazwisko -->
+                 <input type="text" id="inputSurname" name = "Surname" class="form-control " placeholder="Nazwisko" value="{{form.initial.Surname}}" required>
+        </div>
+    </div>
+        <input type="text" id="inputphone_number" name = "phone_number" class="form-control mb-2" placeholder="Numer Telefonu" value="{{form.initial.phone_number}}" required>
+        <input type="text" id="inputcity" name = "city" class="form-control mb-2"   placeholder="Miasto" value="{{form.initial.city}}">
+        <input type="text" id="inputadress" name = "adress" class="form-control mb-2" placeholder="Adres" value="{{form.initial.adress}}">
+        <input type ="text" id= "inputconversation_email" name ="email_conversation" class = "form-control  mb-2" placeholder="Adres Email do konwersacji" value="{{form.initial.email_conversation}}">  
+        <input type ="text" id= "inputage" name ="age" class = "form-control" placeholder="Wiek" value="{{form.initial.age}}">
+        <label for="private">Ukryte?</label>
+        <input type="checkbox" id="inputprivate" name = "private" value = "{{form.initial.private}}">
+  
+    {% endif %}    
+
+
+<button class="btn  dusty-grass-gradient my-2 btn-block" id="submit" type="submit">Zarejestruj się</button>
+    {% for field in form %}
+        {% for error in  field.errors %}
+            <small style="color: red;">{{error}}</small>
+        {% endfor %}
+    {% endfor %}
+
+    {% if form.non_field_errors %}
+        <div style = "color:red;">
+            <p>{{form.non_field_errors}}</p>
+        </div>
+    {% endif %}
+
+</form>
+
+
+   
+
+{% endblock content %}

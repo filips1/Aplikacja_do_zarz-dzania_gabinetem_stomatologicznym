@@ -1,0 +1,111 @@
+   {% for p,b,c,d,e in lista %}
+
+    <tr>
+      <td>{{p.First_Name}}</td>
+      <td>{{p.Surname}}</td>
+      {%if p.account == None%}
+      <td>Nie</td>
+      {% else %}
+      <td>Tak</td>
+
+      {% endif %}
+            <td>{{b}}</td>
+            <td>{{c}}</td>
+            {% if d >= 300 %}
+            <td><p style="color:Tomato;"><strong>{{d}} dni</strong></p></td>
+
+            {% else %}
+
+            <td>{{d}}</td>
+      {% endif %}
+
+
+                  <td>  
+      {% if e %}  
+  
+      {% if request.user.is_dentist %}                             
+      <a type="button" class="btn btn-sm btn-info" style="width:100px"  href = "{% url 'tooth_all_view' p.id %}">Zęby</a>
+      {% if d == "Żadna się nie odbyła" or d >= 300 %}    
+            <a type="button"
+            class="btn  btn-sm btn-danger new_visit_view" id="new_visit{{p.id}}" style="width:100px" 
+            data-url="{% url 'new_visit' p.id %}">Nowa wizyta</a>
+      </a>
+      {% else %}
+            <a type="button"style="width:100px" 
+            class="btn btn-sm btn-info new_visit_view" id = "new_visit{{p.id}}"
+            data-url="{% url 'new_visit' p.id %}">Nowa wizyta</a>
+      {% endif %}
+      {% else %}
+       {% if d == "Żadna się nie odbyła" or d >= 300 %}    
+            <a type="button"
+            class="btn  btn-sm btn-danger new_visit_view" style="width:100px" 
+            data-url="{% url 'new_visit_receptionist' curr_dentist_id p.id %}">Nowa wizyta</a>
+      </a>
+      {% else %}
+            <a type="button"style="width:100px" 
+            class="btn btn-sm btn-info new_visit_view"
+            data-url="{% url 'new_visit_receptionist' curr_dentist_id p.id %}">Nowa wizyta</a>
+      {% endif %}
+      {% endif %}
+      {% endif %}
+      {% if p.account is not None %}
+                        <a type="button"style="width:100px" 
+              class="btn btn-green btn-sm test"
+              href="{% url 'chat' p.account %}"> Czat
+      {% endif %}
+      </a>
+          {% if request.user.is_dentist %}
+           {% if p.account == None and e %}
+
+
+          <a type="button"style="width:100px" 
+              class="btn  btn-warning btn-sm patient_update"
+              data-url="{% url 'patient_update' p.id %}"> Edytuj
+      </a>
+            <a type="button"style="width:100px" 
+              class="btn btn-danger btn-sm delete_patient"
+              data-url="{% url 'patient_delete' p.id %}"> Usuń 
+      </a>
+
+      {% else %}
+      {% if e %}
+            <a type="button"style="width:100px" 
+              class="btn btn-danger btn-sm delete_patient"
+              data-url="{% url 'patient_invite_remove' p.id %}">Wyrzuć z listy 
+      </a>
+      {% else %}
+                  <a type="button"style="width:100px" 
+              class="btn btn-warning btn-sm delete_patient"
+              data-url="{% url 'patient_invite_remove' p.id %}">Dodaj do listy 
+      </a>
+      {% endif %}
+      {% endif %}
+      {% else %}
+      {% if p.account == None and e %}
+                <a type="button"style="width:100px" 
+              class="btn  btn-warning btn-sm patient_update"
+              data-url="{% url 'patient_update' p.id curr_dentist_id %}"> Edytuj
+      </a>
+                  <a type="button"style="width:100px" 
+              class="btn btn-danger btn-sm delete_patient"
+              data-url="{% url 'patient_delete' p.id curr_dentist_id %}"> Usuń 
+      </a>
+            {% else %}
+      {% if e %}
+            <a type="button"style="width:100px" 
+              class="btn btn-danger btn-sm delete_patient"
+              data-url="{% url 'patient_invite_remove' p.id curr_dentist_id%}">Wyrzuć z listy 
+      </a>
+      {% else %}
+                  <a type="button"style="width:100px" 
+              class="btn btn-warning btn-sm delete_patient"
+              data-url="{% url 'patient_invite_remove' p.id curr_dentist_id %}">Dodaj do listy 
+      </a>
+      {% endif %}
+      {% endif %}
+      {% endif %}
+
+</td>
+    </tr>
+
+    {% endfor %}

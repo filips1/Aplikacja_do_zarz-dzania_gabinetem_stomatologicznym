@@ -1,0 +1,75 @@
+
+       {% if unregistered or auth_only %}
+        {% for d in dentist %}
+         <tr>
+      <td>{{d.First_Name}}</td>
+      <td>{{d.Surname}}</td>
+      <td>{{d.phone_number}}</td>
+      <td>{{d.city}}</td>
+      <td>{{d.clinic_adress}}</td>
+      {% if auth_only %}
+      <td>
+
+                            <a type="button"
+              class="btn btn-green btn-sm delete_patient"
+              href="{% url 'chat' d.account %}"> Czat
+      </a>
+
+       <a class="btn btn-sm btn-info" href="{% url 'dentist_profile' d.id %}">Profil</a>
+          </td>
+          {% endif %}
+          {% endfor %}
+
+
+        {% else %}
+        {% for d,a in dentist %}
+
+
+    <tr>
+      <td>{{d.First_Name}}</td>
+      <td>{{d.Surname}}</td>
+      <td>{{d.phone_number}}</td>
+      <td>{{d.city}}</td>
+      <td>{{d.clinic_adress}}</td>
+      {% if is_patient %}
+      {% if a %}
+      <td>TAK</td>
+      <td> <a class="btn btn-sm btn-info dentist_change_stat_view btn-block" style="width: 120px;"  data-url="{% url 'dentist_change_stat' d.id %}">Zrezygnuj</a></td>
+      {% else %}
+      <td>NIE</td>
+      <td> <a class="btn btn-sm btn-info dentist_change_stat_view btn-block" id="dentist_join_{{d.id}}" style="width: 120px;"  data-url="{% url 'dentist_change_stat' d.id %}">Dołącz</a></td>
+      {% endif %}
+      {% elif request.user.is_receptionist %}
+      {% if a %}
+      <td>TAK</td>
+      <td> <a class="btn btn-sm btn-info join_as_receptionist btn-block" style="width: 120px;"  data-url="{% url 'join_as_receptionist' d.id %}">Zrezygnuj</a></td>
+      {% else %}
+      <td>NIE</td>
+      <td> <a class="btn btn-sm btn-info leave_as_receptionist btn-block" style="width: 120px;"  data-url="{% url 'join_as_receptionist' d.id %}">Zostań recepcjonistą</a></td>
+      {% endif %}
+      {% endif %}
+      <td>
+        <center>
+
+                            <a type="button"
+              class="btn btn-green btn-sm  delete_patient" style="width: 90px" 
+              href="{% url 'chat' d.account %}"> Czat
+      </a>
+
+       <a class="btn btn-sm btn-info " style="width: 90px"   href="{% url 'dentist_profile' d.id %}">Profil</a>
+      {% if is_patient %}
+       <a type="button"
+            class="btn btn-sm btn-info new_visit_view  " style="width: 120px;" 
+            data-url="{% url 'new_visit_heh' d.id  %}">Zaplanuj wizytę</a>
+</center>
+          </td>
+      {% endif %}
+
+
+
+
+    </tr>
+
+    {% endfor %}
+    {% endif %}
+    </script>

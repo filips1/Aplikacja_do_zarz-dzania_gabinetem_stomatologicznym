@@ -1,0 +1,36 @@
+{% if recep %}
+{% if invite or remove %}
+<form method="post" action="{% url 'patient_invite_remove' patient.id id %}" class="patient_delete_form">
+{% else %}
+<form method="post" action="{% url 'patient_delete' patient.id id %}" class="patient_delete_form">
+{% endif %}
+{% else %}
+{% if invite or remove %}
+<form method="post" action="{% url 'patient_invite_remove' patient.id %}" class="patient_delete_form">
+{% else %}
+<form method="post" action="{% url 'patient_delete' patient.id %}" class="patient_delete_form">
+  {% endif %}
+  {% endif %}
+  {% csrf_token %}
+  <div class="modal-header">
+    {% if invite %}
+    <h4 class="modal-title">Czy na pewno chcesz dodać</h4>
+    {% else %}
+    <h4 class="modal-title">Czy na pewno chcesz usunąć</h4>
+    {% endif %}
+    
+  </div>
+  <div class="modal-body">
+    {% if invite %}
+    <p class="lead">Czy na pewno chcesz dodać pacjenta <strong>{{ patient.First_Name }} {{patient.Surname}}</strong> do listy?</p>
+    {% elif remove %}
+    <p class="lead">Czy na pewno chcesz usunąć pacjenta <strong>{{ patient.First_Name }} {{patient.Surname}}</strong>z listy?</p>
+    {% else %}
+    <p class="lead">Czy na pewno chcesz usunąć pacjenta <strong>{{ patient.First_Name }} {{patient.Surname}}</strong>?</p>
+     {% endif %}
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+    <button type="submit" class="btn btn-danger">Usuń</button>
+  </div>
+</form>

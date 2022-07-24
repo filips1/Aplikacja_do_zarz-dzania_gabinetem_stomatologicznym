@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load mapbox_location_field_tags %}
+{% location_field_includes %}
+{% include_jquery %}
+
+<style type='text/css'>
+.form {
+  margin: auto;
+}
+
+.form input, .form select, .form textarea {
+  border-radius: 5px;
+  border: 1px solid #17a2b8;
+  outline: none;
+  background: none;
+  padding: 5px;
+  width: 100%;
+}
+</style>
+<center>
+  <h1> Ustaw lokalizację na mapie </h1>
+  <br/>
+  <br/>
+<div id='map' style='width: 400px; height: 300px;'>
+ <form method="post">
+    
+        {% csrf_token %}
+
+        <table class="form form-table">
+
+<tbody><tr><th><label for="id_name">Nazwa Placówki:</label></th><td>{{form.name}}</td></tr>
+<tr><th><label for="id_about">Opis placówki:</label></th><td>{{form.about}}</td></tr>
+{{form.creator}}
+</table>
+
+<p style="font-weight: 400;
+    text-align: -internal-center;font-size:14px">Wybierz lokalizację na mapie. Położenie geograficzne pojawi się na dole
+<div class="form" style='width: 400px;'>
+{{form.location}}</div></p>
+        <button type="submit" value="submit"> Zatwierdź</button>
+    </form>
+{{ form.media }}
+{{form.errors}}
+</div>
+<center>
+ 
+{% endblock content %}
