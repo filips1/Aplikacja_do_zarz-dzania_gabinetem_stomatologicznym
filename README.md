@@ -2,6 +2,8 @@
 
 Celem aplikacji było zaprojektowanie oraz implementacja aplikacji internetowej służącej do zarządzania gabinetem stomatologicznym. 
 
+Do programu została napisana duża ilość testów jednostkowych i integracyjnych a także kilka testów akceptacyjnych.
+
 Program został wykonany przy pomocy frameworka Django wraz z Celery i Django Channels a także Javascript/JQuery i AJAX. Do wykonania projektu wykorzystana została baza danych MySQL.
 
 #Funkcjonalności
