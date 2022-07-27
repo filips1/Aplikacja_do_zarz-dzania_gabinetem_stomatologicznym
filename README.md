@@ -16,5 +16,5 @@ Użytkownik korzystający z systemu powinien być w stanie korzystać z poszczeg
 - Historia leczenia
 - Aktualizowanie danych - Status wizyty będzie cyklicznie aktualizowany w tle przy wykorzystaniu Celery które umożliwia wykonywanie zadań w tle
 - Czat - dentysta ma możliwosć komunikowania się z pacjentem za pomocą czatu utworzonego przy wykorzystaniu Django Channels umożliwiającą wykorzystanie technologii WebSocket
-
+- Zarządzanie Gabinetem Dentystycznym - Do danego gabinetu dentystycznego mogą być przypisani dentyści i recepcjoniści
 
